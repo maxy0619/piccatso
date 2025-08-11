@@ -43,6 +43,13 @@
         novalidate: 'novalidate',
         data-type: 'add-to-cart-form'
       -%}
+        {%- comment -%}
+          Piccatso metadata (populated by app script before submit):
+          properties[Piccatso Render URL], properties[Piccatso Render ID], properties[Piccatso Style]
+        {%- endcomment -%}
+        <input type="hidden" name="properties[Piccatso Render URL]" value="">
+        <input type="hidden" name="properties[Piccatso Render ID]" value="">
+        <input type="hidden" name="properties[Piccatso Style]" value="">
         <input
           type="hidden"
           name="id"

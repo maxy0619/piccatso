@@ -131,8 +131,15 @@
                           role="cell"
                           headers="CartDrawer-ColumnProductImage"
                         >
-                          {% if item.image %}
-                            {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
+                          {% comment %}
+                            Prefer Piccatso preview image if provided via line item property
+                            properties[Piccatso Render URL]
+                          {% endcomment %}
+                          {% assign preview_url = item.properties["Piccatso Render URL"] %}
+                          {% if preview_url %}
+                            <a href="{{ item.url }}" class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
+                            <img class="cart-item__image" src="{{ preview_url }}" alt="Generated preview" loading="lazy" width="150" height="150">
+                          {% elsif item.image %}
                             <a href="{{ item.url }}" class="cart-item__link" tabindex="-1" aria-hidden="true"> </a>
                             <img
                               class="cart-item__image"

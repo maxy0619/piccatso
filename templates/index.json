@@ -9,29 +9,44 @@
  */
 {
   "sections": {
+    "before-after": {
+      "type": "before-after",
+      "settings": {
+        "heading": "See the transformation",
+        "heading_size": "h2",
+        "heading_alignment": "center",
+        "before_label": "Before",
+        "after_label": "After",
+        "before_asset": "Before and After/Chicago_Before.jpg",
+        "after_asset": "Before and After/Chicago_Studio_Ghibli.png",
+        "color_scheme": "scheme-1",
+        "padding_top": 24,
+        "padding_bottom": 24
+      }
+    },
     "image_banner": {
       "type": "image-banner",
       "blocks": {
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Image banner",
+            "heading": "Turn your photo into gallery‑worthy art in seconds.",
             "heading_size": "h0"
           }
         },
         "text": {
           "type": "text",
           "settings": {
-            "text": "Give customers details about the banner image(s) or content on the template.",
+            "text": "Upload → Preview styles → Print on museum‑grade paper or canvas.",
             "text_style": "body"
           }
         },
         "button": {
           "type": "buttons",
           "settings": {
-            "button_label_1": "Shop all",
-            "button_link_1": "shopify://collections/all",
-            "button_style_secondary_1": true,
+            "button_label_1": "Create yours",
+            "button_link_1": "/#create",
+            "button_style_secondary_1": false,
             "button_label_2": "",
             "button_link_2": "",
             "button_style_secondary_2": false
@@ -204,20 +219,241 @@
         "column3"
       ],
       "settings": {
-        "title": "",
+        "title": "How it works",
         "heading_size": "h1",
         "image_width": "third",
         "image_ratio": "adapt",
-        "button_label": "",
-        "button_link": "",
+        "button_label": "Create yours",
+        "button_link": "/#create",
         "columns_desktop": 3,
-        "column_alignment": "center",
+        "column_alignment": "left",
         "background_style": "none",
         "color_scheme": "scheme-1",
         "columns_mobile": "1",
         "swipe_on_mobile": false,
         "padding_top": 36,
         "padding_bottom": 36
+      }
+    },
+    "formats_pricing": {
+      "type": "multicolumn",
+      "blocks": {
+        "format-poster": {
+          "type": "column",
+          "settings": {
+            "title": "Poster Prints",
+            "text": "<p>Premium matte archival paper. Sizes: A4, A3, A2, 18x24, 24x36. From $29.<\/p>",
+            "link_label": "See sizes",
+            "link": "/products"
+          }
+        },
+        "format-canvas": {
+          "type": "column",
+          "settings": {
+            "title": "Canvas Wraps",
+            "text": "<p>Thick canvas, hand‑stretched on pine. Sizes: 12x16, 18x24, 24x36. From $59.<\/p>",
+            "link_label": "See sizes",
+            "link": "/products"
+          }
+        },
+        "format-framed": {
+          "type": "column",
+          "settings": {
+            "title": "Framed Prints",
+            "text": "<p>Black/White frames with acrylic glazing. Ready to hang. From $79.<\/p>",
+            "link_label": "See frames",
+            "link": "/products"
+          }
+        }
+      },
+      "block_order": [
+        "format-poster",
+        "format-canvas",
+        "format-framed"
+      ],
+      "settings": {
+        "title": "Formats & pricing",
+        "heading_size": "h2",
+        "image_width": "third",
+        "image_ratio": "adapt",
+        "button_label": "Create yours",
+        "button_link": "/#create",
+        "columns_desktop": 3,
+        "column_alignment": "left",
+        "background_style": "none",
+        "color_scheme": "scheme-1",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 20,
+        "padding_bottom": 32
+      }
+    },
+    "faq": {
+      "type": "collapsible-content",
+      "blocks": {
+        "faq-quality": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What photo quality do I need?",
+            "icon": "question_mark",
+            "row_content": "<p>Most smartphone photos work. For best results, upload the original high‑res image (no screenshots).<\/p>",
+            "page": ""
+          }
+        },
+        "faq-rights": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "Who owns the artwork?",
+            "icon": "lock",
+            "row_content": "<p>You retain rights to your original photo; your generated print is produced for personal use and display.<\/p>",
+            "page": ""
+          }
+        },
+        "faq-shipping": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "How fast do you ship?",
+            "icon": "truck",
+            "row_content": "<p>We produce within 48 hours and ship with tracking. Typical delivery: 3–7 business days US/CA; 5–10 days international.<\/p>",
+            "page": ""
+          }
+        },
+        "faq-returns": {
+          "type": "collapsible_row",
+          "settings": {
+            "heading": "What if there’s a defect?",
+            "icon": "check_mark",
+            "row_content": "<p>We’ll reprint and replace at no cost for any print or framing defects.<\/p>",
+            "page": ""
+          }
+        }
+      },
+      "block_order": [
+        "faq-quality",
+        "faq-rights",
+        "faq-shipping",
+        "faq-returns"
+      ],
+      "settings": {
+        "caption": "FAQ",
+        "heading": "Everything you need to know",
+        "heading_size": "h2",
+        "heading_alignment": "center",
+        "layout": "row",
+        "container_color_scheme": "scheme-2",
+        "color_scheme": "scheme-1",
+        "open_first_collapsible_row": false,
+        "image_ratio": "adapt",
+        "desktop_layout": "image_second",
+        "padding_top": 20,
+        "padding_bottom": 40
+      }
+    },
+    "style_sampler": {
+      "type": "slideshow",
+      "blocks": {
+        "style1": {
+          "type": "slide",
+          "settings": {
+            "heading": "Classic",
+            "heading_size": "h2",
+            "subheading": "Timeless, museum‑ready.",
+            "button_label": "Try this style",
+            "link": "/#create",
+            "button_style_secondary": false,
+            "show_text_box": true,
+            "box_align": "bottom-left",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "color_scheme": "scheme-1",
+            "image": "Before and After/Chicago_Studio_Ghibli.png"
+          }
+        },
+        "style2": {
+          "type": "slide",
+          "settings": {
+            "heading": "One Piece",
+            "heading_size": "h2",
+            "subheading": "Anime-inspired.",
+            "button_label": "Try this style",
+            "link": "/#create",
+            "button_style_secondary": false,
+            "show_text_box": true,
+            "box_align": "bottom-left",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "color_scheme": "scheme-1",
+            "image": "Before and After/Dogs2_OnePiece.png"
+          }
+        },
+        "style3": {
+          "type": "slide",
+          "settings": {
+            "heading": "Ghibli",
+            "heading_size": "h2",
+            "subheading": "Whimsical, detailed.",
+            "button_label": "Try this style",
+            "link": "/#create",
+            "button_style_secondary": false,
+            "show_text_box": true,
+            "box_align": "bottom-left",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "color_scheme": "scheme-1",
+            "image": "Before and After/Dogs2_Ghibli.png"
+          }
+        },
+        "style4": {
+          "type": "slide",
+          "settings": {
+            "heading": "Picasso",
+            "heading_size": "h2",
+            "subheading": "Cubist flair.",
+            "button_label": "Try this style",
+            "link": "/#create",
+            "button_style_secondary": false,
+            "show_text_box": true,
+            "box_align": "bottom-left",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "color_scheme": "scheme-1",
+            "image": "Before and After/Dogs2_Picasso.png"
+          }
+        },
+        "style5": {
+          "type": "slide",
+          "settings": {
+            "heading": "Ghibli City",
+            "heading_size": "h2",
+            "subheading": "Dreamlike cityscape.",
+            "button_label": "Try this style",
+            "link": "/#create",
+            "button_style_secondary": false,
+            "show_text_box": true,
+            "box_align": "bottom-left",
+            "text_alignment": "left",
+            "text_alignment_mobile": "left",
+            "color_scheme": "scheme-1",
+            "image": "Before and After/Chicago_Studio_Ghibli.png"
+          }
+        }
+      },
+      "block_order": [
+        "style1",
+        "style2",
+        "style3",
+        "style4",
+        "style5"
+      ],
+      "settings": {
+        "layout": "full_bleed",
+        "slide_height": "small",
+        "slider_visual": "dots",
+        "auto_rotate": false,
+        "change_slides_speed": 5,
+        "image_behavior": "none",
+        "show_text_below": false,
+        "accessibility_info": "Style sampler"
       }
     },
     "1754839513e52ab464": {
@@ -240,11 +476,15 @@
   },
   "order": [
     "image_banner",
+    "1754839513e52ab464",
+    "style_sampler",
+    "before-after",
+    "multicolumn",
+    "formats_pricing",
+    "faq",
     "rich_text",
     "featured_collection",
     "collage",
-    "video",
-    "multicolumn",
-    "1754839513e52ab464"
+    "video"
   ]
 }

@@ -3,6 +3,9 @@
     "main": {
       "type": "main-product",
       "blocks": {
+        "app": {
+          "type": "@app"
+        },
         "vendor": {
           "type": "text",
           "settings": {
@@ -86,6 +89,7 @@
         }
       },
       "block_order": [
+        "app",
         "vendor",
         "title",
         "caption",

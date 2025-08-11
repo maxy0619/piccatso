@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "apps",
+      "blocks": {
+        "piccatso_tool_upload_picker_create": {
+          "type": "shopify://apps/piccatso-tool/blocks/upload_picker/d220211d-db7d-40be-8645-fc17888bb8ee",
+          "settings": {
+            "heading": "Create your art"
+          }
+        }
+      },
+      "block_order": [
+        "piccatso_tool_upload_picker_create"
+      ],
+      "settings": {
+        "include_margins": true
+      }
+    }
+  },
+  "order": [
+    "main"
+  ]
+}
+

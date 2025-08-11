@@ -35,6 +35,12 @@
         </button>
       </div>
       <div id="cart-notification-product" class="cart-notification-product"></div>
+      {% comment %} Show preview image if Piccatso provided one {% endcomment %}
+      {% if cart != empty and cart.items.first.properties["Piccatso Render URL"] %}
+        <div class="cart-notification__media" style="margin: 8px 0;">
+          <img src="{{ cart.items.first.properties["Piccatso Render URL"] }}" alt="Generated preview" width="96" height="96" loading="lazy"/>
+        </div>
+      {% endif %}
       <div class="cart-notification__links">
         <a
           href="{{ routes.cart_url }}"
