@@ -81,7 +81,8 @@
           </header-menu>
         {%- else -%}
           {% assign href_url = link.url %}
-          {% if link.title and link.title | downcase == 'home' %}
+          {% assign link_title_downcase = link.title | downcase %}
+          {% if link_title_downcase == 'home' %}
             {% assign href_url = routes.root_url %}
           {% endif %}
           <a
