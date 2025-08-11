@@ -40,7 +40,9 @@
     {%- endif -%}
 
     {{ content_for_header }}
+    {%- comment -%}
     <script src="{{ 'piccatso-bridge.js' | asset_url }}" defer="defer"></script>
+    {%- endcomment -%}
 
     {%- liquid
       assign body_font_bold = settings.type_body_font | font_modify: 'weight', 'bold'
