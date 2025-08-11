@@ -71,9 +71,13 @@
             </details>
           </header-menu>
         {%- else -%}
+          {% assign href_url = link.url %}
+          {% if link.title and link.title | downcase == 'home' %}
+            {% assign href_url = routes.root_url %}
+          {% endif %}
           <a
             id="HeaderMenu-{{ link.handle }}"
-            href="{{ link.url }}"
+            href="{{ href_url }}"
             class="header__menu-item list-menu__item link link--text focus-inset"
             {% if link.current %}
               aria-current="page"
