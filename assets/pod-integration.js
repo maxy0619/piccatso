@@ -7,7 +7,7 @@ class PicatsoPODIntegration {
   constructor(config) {
     this.apiKey = config.apiKey;
     this.baseUrl = config.baseUrl;
-    this.markupPercentage = config.markupPercentage || 40;
+    this.markupPercentage = config.markupPercentage || 100;
     this.podService = config.service || 'printful'; // printful, printify, gooten
   }
 
@@ -269,12 +269,28 @@ class PicatsoPODIntegration {
 
 // Initialize POD integration when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-  // This will be configured with actual credentials
-  window.PicatsoPOD = new PicatsoPODIntegration({
-    service: 'printful', // Will be configurable
-    apiKey: 'YOUR_API_KEY', // Will be set from Shopify settings
-    markupPercentage: 40
-  });
+  // Wait for credentials to load, then initialize
+  if (window.PrintfulCredentials && window.PrintfulCredentials.isConfigured()) {
+    window.PicatsoPOD = new PicatsoPODIntegration({
+      service: 'printful',
+      apiKey: window.PrintfulCredentials.api_key,
+      baseUrl: window.PrintfulCredentials.endpoints.base_url,
+      markupPercentage: window.PrintfulCredentials.markup_percentage,
+      testMode: window.PrintfulCredentials.test_mode
+    });
+    
+    console.log('✅ Piccatso POD Integration initialized with Printful');
+  } else {
+    console.warn('⚠️ Printful credentials not configured. Please update config/printful-credentials.js');
+    
+    // Initialize with placeholder for development
+    window.PicatsoPOD = new PicatsoPODIntegration({
+      service: 'printful',
+      apiKey: 'PLACEHOLDER_KEY',
+      markupPercentage: 100,
+      testMode: true
+    });
+  }
 });
 
 // Export for use in other modules

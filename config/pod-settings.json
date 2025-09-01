@@ -8,7 +8,7 @@
       "test_mode": true
     },
     "pricing": {
-      "markup_percentage": 40,
+      "markup_percentage": 100,
       "currency": "USD",
       "tax_inclusive": false
     },
