@@ -358,10 +358,36 @@ document.addEventListener('DOMContentLoaded', function() {
     addToShopifyCart(properties, sizeConfig.price);
   }
 
-  // Add to Shopify cart
+  // Add to Shopify cart with Printful integration
   function addToShopifyCart(properties, price) {
-    // This would integrate with your existing Shopify cart system
-    // For now, we'll show a success message
+    // Get the real Printful product/variant IDs if available
+    const printfulData = window.PrintfulSizeConfigs || {};
+    const productTypeData = printfulData[selectedProductType] || [];
+    const sizeData = productTypeData.find(s => s.id === selectedSize);
+
+    // Update form properties for Printful integration
+    const form = document.querySelector('form[data-type="add-to-cart-form"]');
+    if (form) {
+      // Set Piccatso properties
+      form.querySelector('input[name="properties[Piccatso Render URL]"]').value = currentImageUrl || '';
+      form.querySelector('input[name="properties[Product Type]"]').value = selectedProductType || '';
+      form.querySelector('input[name="properties[Size]"]').value = selectedSize || '';
+      
+      // Set Printful properties for Shopify-Printful integration
+      if (sizeData) {
+        form.querySelector('input[name="properties[printful_product_id]"]').value = sizeData.printfulProductId || '';
+        form.querySelector('input[name="properties[printful_variant_id]"]').value = sizeData.printfulVariantId || '';
+        form.querySelector('input[name="properties[design_url]"]').value = currentImageUrl || '';
+      }
+
+      // Submit the form to add to cart
+      const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+      if (submitBtn) {
+        submitBtn.click();
+      }
+    }
+
+    // Show success feedback
     const addToCartBtn = document.getElementById('pod-add-to-cart');
     addToCartBtn.textContent = 'Added to Cart!';
     addToCartBtn.style.background = '#10b981';

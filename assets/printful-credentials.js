@@ -12,7 +12,7 @@ window.PrintfulCredentials = {
   // INSERT YOUR PRINTFUL CREDENTIALS HERE:
   // ===========================================
   
-  api_key: "YOUR_PRINTFUL_API_KEY_HERE", // Get from: https://www.printful.com/dashboard/store → API
+  api_key: "SN4GZmmZF0weeNEdqh67XEfMwtQjpTQ7ZbsnJ4CI", // Get from: https://www.printful.com/dashboard/store → API
   
   store_id: "YOUR_STORE_ID_HERE", // Optional: Get from Printful dashboard if using store integration
   
@@ -48,8 +48,8 @@ window.PrintfulCredentials = {
   
   // Printful store integration (if you connected your Shopify store to Printful)
   shopify_integration: {
-    enabled: false, // Set to true if using Printful's Shopify app
-    sync_products: false // Set to true to sync products automatically
+    enabled: true, // Set to true if using Printful's Shopify app
+    sync_products: true // Set to true to sync products automatically
   }
 };
 

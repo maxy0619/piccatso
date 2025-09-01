@@ -46,10 +46,18 @@
         {%- comment -%}
           Piccatso metadata (populated by app script before submit):
           properties[Piccatso Render URL], properties[Piccatso Render ID], properties[Piccatso Style]
+          
+          Printful integration properties (for Shopify-Printful app recognition):
+          properties[printful_product_id], properties[printful_variant_id], properties[design_url]
         {%- endcomment -%}
         <input type="hidden" name="properties[Piccatso Render URL]" value="">
         <input type="hidden" name="properties[Piccatso Render ID]" value="">
         <input type="hidden" name="properties[Piccatso Style]" value="">
+        <input type="hidden" name="properties[Product Type]" value="">
+        <input type="hidden" name="properties[Size]" value="">
+        <input type="hidden" name="properties[printful_product_id]" value="">
+        <input type="hidden" name="properties[printful_variant_id]" value="">
+        <input type="hidden" name="properties[design_url]" value="">
         <input
           type="hidden"
           name="id"

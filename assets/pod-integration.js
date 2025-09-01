@@ -143,9 +143,49 @@ class PicatsoPODIntegration {
   }
 
   /**
-   * Create order with POD service
+   * Create order with POD service (Shopify-Printful Integration)
    */
   async createOrder(orderData) {
+    // When using Shopify-Printful direct integration, orders are handled differently
+    if (window.PrintfulCredentials?.shopify_integration?.enabled) {
+      return this.createShopifyIntegratedOrder(orderData);
+    } else {
+      return this.createDirectAPIOrder(orderData);
+    }
+  }
+
+  /**
+   * Create order via Shopify-Printful integration
+   */
+  async createShopifyIntegratedOrder(orderData) {
+    // With Shopify-Printful integration, we primarily need to:
+    // 1. Ensure the line item has proper properties
+    // 2. The Printful app will automatically pick up orders with the right format
+    
+    console.log('📦 Creating order via Shopify-Printful integration');
+    
+    // Prepare line item properties for Printful recognition
+    const printfulProperties = {
+      'printful_product_id': this.getProductId(orderData.productType, orderData.size),
+      'printful_variant_id': this.getVariantId(orderData.productType, orderData.size),
+      'design_url': orderData.imageUrl,
+      'piccatso_render_id': orderData.renderId,
+      'piccatso_style': orderData.styleName
+    };
+
+    // Return success - the actual order creation will be handled by Shopify
+    return {
+      success: true,
+      integration_type: 'shopify_printful',
+      properties: printfulProperties,
+      message: 'Order will be processed by Shopify-Printful integration'
+    };
+  }
+
+  /**
+   * Create order via direct API (fallback)
+   */
+  async createDirectAPIOrder(orderData) {
     const endpoint = this.getAPIEndpoint('orders');
     
     const podOrderData = {
