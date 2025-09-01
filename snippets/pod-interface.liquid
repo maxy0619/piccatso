@@ -1,0 +1,389 @@
+{% comment %}
+  Print-on-Demand Interface for Piccatso
+  This snippet renders the complete POD selection interface
+{% endcomment %}
+
+<div class="pod-integration" id="pod-interface" style="display: none;">
+  <div class="pod-header">
+    <h2>Choose Your Print Options</h2>
+    <p>Select your preferred format, size, and see how your AI art will look in different environments</p>
+  </div>
+
+  <!-- Product Type Selection -->
+  <div class="product-type-selector">
+    <label class="product-type-option" for="type-canvas">
+      <input type="radio" name="product_type" value="canvas" id="type-canvas" checked>
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM5 17l3.5-4.5 2.5 3.01L14.5 11l4.5 6H5z"/>
+        </svg>
+      </div>
+      <h3>Canvas Print</h3>
+      <p>Premium canvas with gallery-wrap finish</p>
+    </label>
+
+    <label class="product-type-option" for="type-poster">
+      <input type="radio" name="product_type" value="poster" id="type-poster">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+        </svg>
+      </div>
+      <h3>Poster Print</h3>
+      <p>High-quality paper print, perfect for framing</p>
+    </label>
+
+    <label class="product-type-option" for="type-metal">
+      <input type="radio" name="product_type" value="metal" id="type-metal">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+      </div>
+      <h3>Metal Print</h3>
+      <p>Vibrant colors on aluminum with modern finish</p>
+    </label>
+
+    <label class="product-type-option" for="type-framed">
+      <input type="radio" name="product_type" value="framed" id="type-framed">
+      <div class="icon">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+          <path d="M21 3H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM7 7h10v10H7V7z"/>
+        </svg>
+      </div>
+      <h3>Framed Print</h3>
+      <p>Ready to hang with premium frame included</p>
+    </label>
+  </div>
+
+  <!-- Size Selection -->
+  <div class="size-selector">
+    <h3>Select Size</h3>
+    <div class="size-options" id="size-options">
+      <!-- Sizes will be populated dynamically based on product type -->
+    </div>
+  </div>
+
+  <!-- Mockup Gallery -->
+  <div class="mockup-gallery">
+    <h3>Preview in Different Environments</h3>
+    <div class="mockup-grid" id="mockup-grid">
+      <div class="pod-loading">
+        <div class="spinner"></div>
+        <p>Generating mockups...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add to Cart Section -->
+  <div class="pod-add-to-cart" id="pod-cart-section" style="display: none;">
+    <h3>Add to Cart</h3>
+    <div class="pod-summary">
+      <div class="pod-summary-details">
+        <h4 id="selected-product-name">Canvas Print - A4</h4>
+        <p id="selected-product-details">Premium canvas with gallery-wrap finish</p>
+      </div>
+      <div class="pod-summary-price">
+        <div class="original-price" id="original-price" style="display: none;">$29.99</div>
+        <div class="price" id="customer-price">$41.99</div>
+      </div>
+    </div>
+    
+    <button type="button" class="pod-add-to-cart-btn" id="pod-add-to-cart" disabled>
+      Select size to continue
+    </button>
+  </div>
+
+  <!-- Error Display -->
+  <div class="pod-error" id="pod-error" style="display: none;">
+    <h4>Oops! Something went wrong</h4>
+    <p id="pod-error-message">Please try again or contact support if the issue persists.</p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Size configurations for different product types
+  const sizeConfigs = {
+    canvas: [
+      { id: 'a4', name: 'A4', dimensions: '8.3" × 11.7"', price: 29.99 },
+      { id: 'a3', name: 'A3', dimensions: '11.7" × 16.5"', price: 39.99 },
+      { id: 'a2', name: 'A2', dimensions: '16.5" × 23.4"', price: 59.99 },
+      { id: '12x16', name: '12" × 16"', dimensions: '12" × 16"', price: 49.99 },
+      { id: '18x24', name: '18" × 24"', dimensions: '18" × 24"', price: 69.99 },
+      { id: '24x36', name: '24" × 36"', dimensions: '24" × 36"', price: 99.99 }
+    ],
+    poster: [
+      { id: 'a4', name: 'A4', dimensions: '8.3" × 11.7"', price: 19.99 },
+      { id: 'a3', name: 'A3', dimensions: '11.7" × 16.5"', price: 24.99 },
+      { id: 'a2', name: 'A2', dimensions: '16.5" × 23.4"', price: 34.99 },
+      { id: '12x16', name: '12" × 16"', dimensions: '12" × 16"', price: 29.99 },
+      { id: '18x24', name: '18" × 24"', dimensions: '18" × 24"', price: 39.99 },
+      { id: '24x36', name: '24" × 36"', dimensions: '24" × 36"', price: 54.99 }
+    ],
+    metal: [
+      { id: 'a4', name: 'A4', dimensions: '8.3" × 11.7"', price: 49.99 },
+      { id: 'a3', name: 'A3', dimensions: '11.7" × 16.5"', price: 69.99 },
+      { id: 'a2', name: 'A2', dimensions: '16.5" × 23.4"', price: 99.99 },
+      { id: '12x16', name: '12" × 16"', dimensions: '12" × 16"', price: 79.99 },
+      { id: '18x24', name: '18" × 24"', dimensions: '18" × 24"', price: 119.99 },
+      { id: '24x36', name: '24" × 36"', dimensions: '24" × 36"', price: 179.99 }
+    ],
+    framed: [
+      { id: 'a4', name: 'A4', dimensions: '8.3" × 11.7"', price: 59.99 },
+      { id: 'a3', name: 'A3', dimensions: '11.7" × 16.5"', price: 79.99 },
+      { id: 'a2', name: 'A2', dimensions: '16.5" × 23.4"', price: 119.99 },
+      { id: '12x16', name: '12" × 16"', dimensions: '12" × 16"', price: 99.99 },
+      { id: '18x24', name: '18" × 24"', dimensions: '18" × 24"', price: 139.99 },
+      { id: '24x36', name: '24" × 36"', dimensions: '24" × 36"', price: 199.99 }
+    ]
+  };
+
+  let selectedProductType = 'canvas';
+  let selectedSize = null;
+  let currentImageUrl = null;
+
+  // Initialize POD interface
+  function initializePOD() {
+    updateSizeOptions();
+    bindEventListeners();
+  }
+
+  // Update size options based on selected product type
+  function updateSizeOptions() {
+    const sizeOptionsContainer = document.getElementById('size-options');
+    const sizes = sizeConfigs[selectedProductType];
+    
+    sizeOptionsContainer.innerHTML = sizes.map(size => `
+      <label class="size-option" for="size-${size.id}">
+        <input type="radio" name="size" value="${size.id}" id="size-${size.id}">
+        <div class="size-name">${size.name}</div>
+        <div class="size-dimensions">${size.dimensions}</div>
+        <div class="size-price">$${size.price}</div>
+      </label>
+    `).join('');
+
+    // Bind size selection events
+    document.querySelectorAll('input[name="size"]').forEach(input => {
+      input.addEventListener('change', handleSizeSelection);
+    });
+  }
+
+  // Handle product type selection
+  function handleProductTypeSelection(event) {
+    selectedProductType = event.target.value;
+    selectedSize = null;
+    
+    // Update UI
+    document.querySelectorAll('.product-type-option').forEach(option => {
+      option.classList.remove('selected');
+    });
+    event.target.closest('.product-type-option').classList.add('selected');
+    
+    updateSizeOptions();
+    hideMockups();
+    hideCartSection();
+  }
+
+  // Handle size selection
+  function handleSizeSelection(event) {
+    selectedSize = event.target.value;
+    
+    // Update UI
+    document.querySelectorAll('.size-option').forEach(option => {
+      option.classList.remove('selected');
+    });
+    event.target.closest('.size-option').classList.add('selected');
+    
+    updateCartSection();
+    
+    // Generate mockups if image is available
+    if (currentImageUrl) {
+      generateMockups();
+    }
+  }
+
+  // Update cart section with selected options
+  function updateCartSection() {
+    if (!selectedSize) return;
+    
+    const sizeConfig = sizeConfigs[selectedProductType].find(s => s.id === selectedSize);
+    const productNames = {
+      canvas: 'Canvas Print',
+      poster: 'Poster Print', 
+      metal: 'Metal Print',
+      framed: 'Framed Print'
+    };
+    
+    const productDescriptions = {
+      canvas: 'Premium canvas with gallery-wrap finish',
+      poster: 'High-quality paper print, perfect for framing',
+      metal: 'Vibrant colors on aluminum with modern finish',
+      framed: 'Ready to hang with premium frame included'
+    };
+
+    document.getElementById('selected-product-name').textContent = 
+      `${productNames[selectedProductType]} - ${sizeConfig.name}`;
+    document.getElementById('selected-product-details').textContent = 
+      productDescriptions[selectedProductType];
+    document.getElementById('customer-price').textContent = `$${sizeConfig.price}`;
+    
+    const addToCartBtn = document.getElementById('pod-add-to-cart');
+    addToCartBtn.disabled = false;
+    addToCartBtn.textContent = 'Add to Cart';
+    
+    showCartSection();
+  }
+
+  // Generate mockups for selected options
+  async function generateMockups() {
+    if (!currentImageUrl || !selectedSize) return;
+    
+    showMockupLoading();
+    
+    try {
+      // This would integrate with the actual POD service
+      // For now, we'll show placeholder mockups
+      const mockupData = await createPlaceholderMockups();
+      displayMockups(mockupData);
+    } catch (error) {
+      console.error('Failed to generate mockups:', error);
+      showError('Failed to generate mockups. Please try again.');
+    }
+  }
+
+  // Create placeholder mockups (replace with actual POD integration)
+  async function createPlaceholderMockups() {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    const environments = [
+      { id: 'living_room', name: 'Living Room' },
+      { id: 'bedroom', name: 'Bedroom' },
+      { id: 'office', name: 'Office' },
+      { id: 'gallery', name: 'Gallery Wall' }
+    ];
+
+    return environments.map(env => ({
+      environment: env.name,
+      mockup_url: currentImageUrl, // Placeholder - would be actual mockup
+      details: `${selectedProductType} print in ${env.name.toLowerCase()}`
+    }));
+  }
+
+  // Display generated mockups
+  function displayMockups(mockups) {
+    const mockupGrid = document.getElementById('mockup-grid');
+    
+    mockupGrid.innerHTML = mockups.map(mockup => `
+      <div class="mockup-item">
+        <div class="mockup-image">
+          <img src="${mockup.mockup_url}" alt="${mockup.environment} mockup" 
+               style="width: 100%; height: 100%; object-fit: cover;" 
+               onerror="this.parentElement.innerHTML='<span>Mockup Preview</span>'">
+        </div>
+        <div class="mockup-info">
+          <div class="mockup-environment">${mockup.environment}</div>
+          <div class="mockup-details">${mockup.details}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // Show/hide UI sections
+  function showMockupLoading() {
+    document.getElementById('mockup-grid').innerHTML = `
+      <div class="pod-loading">
+        <div class="spinner"></div>
+        <p>Generating mockups...</p>
+      </div>
+    `;
+  }
+
+  function hideMockups() {
+    document.getElementById('mockup-grid').innerHTML = '';
+  }
+
+  function showCartSection() {
+    document.getElementById('pod-cart-section').style.display = 'block';
+  }
+
+  function hideCartSection() {
+    document.getElementById('pod-cart-section').style.display = 'none';
+  }
+
+  function showError(message) {
+    document.getElementById('pod-error-message').textContent = message;
+    document.getElementById('pod-error').style.display = 'block';
+  }
+
+  function hideError() {
+    document.getElementById('pod-error').style.display = 'none';
+  }
+
+  // Bind event listeners
+  function bindEventListeners() {
+    // Product type selection
+    document.querySelectorAll('input[name="product_type"]').forEach(input => {
+      input.addEventListener('change', handleProductTypeSelection);
+    });
+
+    // Add to cart button
+    document.getElementById('pod-add-to-cart').addEventListener('click', handleAddToCart);
+  }
+
+  // Handle add to cart
+  function handleAddToCart() {
+    if (!selectedSize || !currentImageUrl) {
+      showError('Please select all options before adding to cart.');
+      return;
+    }
+
+    // Get the current Piccatso render data
+    const piccatsoData = window.currentPiccatsoRender || {};
+    const sizeConfig = sizeConfigs[selectedProductType].find(s => s.id === selectedSize);
+
+    // Add line item properties for Shopify
+    const properties = {
+      'Product Type': selectedProductType,
+      'Size': selectedSize,
+      'Piccatso Render URL': currentImageUrl,
+      'Piccatso Render ID': piccatsoData.renderId || '',
+      'Piccatso Style': piccatsoData.styleName || '',
+      'Print Specifications': `${sizeConfig.name} ${sizeConfig.dimensions}`
+    };
+
+    // Add to Shopify cart (integrate with existing cart functionality)
+    addToShopifyCart(properties, sizeConfig.price);
+  }
+
+  // Add to Shopify cart
+  function addToShopifyCart(properties, price) {
+    // This would integrate with your existing Shopify cart system
+    // For now, we'll show a success message
+    const addToCartBtn = document.getElementById('pod-add-to-cart');
+    addToCartBtn.textContent = 'Added to Cart!';
+    addToCartBtn.style.background = '#10b981';
+    
+    setTimeout(() => {
+      addToCartBtn.textContent = 'Add to Cart';
+      addToCartBtn.style.background = '';
+    }, 2000);
+  }
+
+  // Public function to show POD interface with image
+  window.showPODInterface = function(imageUrl) {
+    currentImageUrl = imageUrl;
+    document.getElementById('pod-interface').style.display = 'block';
+    
+    // Scroll to POD interface
+    document.getElementById('pod-interface').scrollIntoView({ 
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
+
+  // Initialize when DOM is ready
+  initializePOD();
+});
+</script>

@@ -1,0 +1,109 @@
+{
+  "pod_integration": {
+    "enabled": true,
+    "service": "printful",
+    "api_settings": {
+      "api_key": "",
+      "webhook_url": "",
+      "test_mode": true
+    },
+    "pricing": {
+      "markup_percentage": 40,
+      "currency": "USD",
+      "tax_inclusive": false
+    },
+    "products": {
+      "canvas": {
+        "enabled": true,
+        "name": "Canvas Print",
+        "description": "Premium canvas with gallery-wrap finish",
+        "base_product_id": 162,
+        "variants": {
+          "a4": { "variant_id": 5678, "base_cost": 21.50 },
+          "a3": { "variant_id": 5679, "base_cost": 28.50 },
+          "a2": { "variant_id": 5680, "base_cost": 42.50 },
+          "12x16": { "variant_id": 5681, "base_cost": 35.50 },
+          "18x24": { "variant_id": 5682, "base_cost": 49.50 },
+          "24x36": { "variant_id": 5683, "base_cost": 71.50 }
+        }
+      },
+      "poster": {
+        "enabled": true,
+        "name": "Poster Print", 
+        "description": "High-quality paper print, perfect for framing",
+        "base_product_id": 1,
+        "variants": {
+          "a4": { "variant_id": 1234, "base_cost": 14.25 },
+          "a3": { "variant_id": 1235, "base_cost": 17.85 },
+          "a2": { "variant_id": 1236, "base_cost": 24.95 },
+          "12x16": { "variant_id": 1237, "base_cost": 21.40 },
+          "18x24": { "variant_id": 1238, "base_cost": 28.55 },
+          "24x36": { "variant_id": 1239, "base_cost": 39.25 }
+        }
+      },
+      "metal": {
+        "enabled": true,
+        "name": "Metal Print",
+        "description": "Vibrant colors on aluminum with modern finish",
+        "base_product_id": 89,
+        "variants": {
+          "a4": { "variant_id": 3456, "base_cost": 35.70 },
+          "a3": { "variant_id": 3457, "base_cost": 49.95 },
+          "a2": { "variant_id": 3458, "base_cost": 71.40 },
+          "12x16": { "variant_id": 3459, "base_cost": 57.10 },
+          "18x24": { "variant_id": 3460, "base_cost": 85.65 },
+          "24x36": { "variant_id": 3461, "base_cost": 128.50 }
+        }
+      },
+      "framed": {
+        "enabled": true,
+        "name": "Framed Print",
+        "description": "Ready to hang with premium frame included",
+        "base_product_id": 123,
+        "variants": {
+          "a4": { "variant_id": 7890, "base_cost": 42.85 },
+          "a3": { "variant_id": 7891, "base_cost": 56.95 },
+          "a2": { "variant_id": 7892, "base_cost": 85.65 },
+          "12x16": { "variant_id": 7893, "base_cost": 71.40 },
+          "18x24": { "variant_id": 7894, "base_cost": 99.95 },
+          "24x36": { "variant_id": 7895, "base_cost": 142.80 }
+        }
+      }
+    },
+    "mockup_settings": {
+      "environments": [
+        {
+          "id": "living_room",
+          "name": "Living Room",
+          "template_id": "template_living_room_1"
+        },
+        {
+          "id": "bedroom", 
+          "name": "Bedroom",
+          "template_id": "template_bedroom_1"
+        },
+        {
+          "id": "office",
+          "name": "Office", 
+          "template_id": "template_office_1"
+        },
+        {
+          "id": "gallery",
+          "name": "Gallery Wall",
+          "template_id": "template_gallery_1"
+        }
+      ],
+      "quality": "high",
+      "format": "jpg"
+    },
+    "fulfillment": {
+      "auto_fulfill": true,
+      "notification_email": "",
+      "tracking_enabled": true,
+      "estimated_days": {
+        "production": 2,
+        "shipping": 5
+      }
+    }
+  }
+}
