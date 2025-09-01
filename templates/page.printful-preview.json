@@ -1,0 +1,44 @@
+{
+  "sections": {
+    "preview_hero": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Printful Integration Preview",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Test the Printful integration without needing the Piccatso API. This page simulates the complete print-on-demand workflow with sample images.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 20
+      }
+    },
+    "preview_interface": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "{% render 'printful-preview-interface' %}"
+      }
+    }
+  },
+  "order": [
+    "preview_hero",
+    "preview_interface"
+  ]
+}
