@@ -1,0 +1,775 @@
+{% comment %}
+  Enhanced Print-on-Demand Interface with Swipeable Gallery
+  Features realistic wall art mockups and smooth carousel navigation
+{% endcomment %}
+
+<div class="pod-enhanced-interface" id="pod-enhanced-interface" style="display: none;">
+  <style>
+    .pod-enhanced-interface {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .pod-enhanced-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .pod-enhanced-header h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1rem;
+    }
+    
+    .pod-enhanced-header p {
+      font-size: 1.6rem;
+      color: #64748b;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    /* Carousel Container */
+    .print-options-carousel {
+      position: relative;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      background: #f8fafc;
+      padding: 2rem;
+    }
+    
+    .carousel-container {
+      position: relative;
+      width: 100%;
+      height: 600px;
+      overflow: hidden;
+      border-radius: 1rem;
+    }
+    
+    .carousel-track {
+      display: flex;
+      width: 400%;
+      height: 100%;
+      transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    
+    .print-option-slide {
+      width: 25%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 0 1rem;
+    }
+    
+    /* Wall Mockup Styles */
+    .mockup-container {
+      flex: 1;
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      margin-bottom: 2rem;
+    }
+    
+    .wall-mockup {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .wall-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    }
+    
+    .wall-mockup.modern .wall-background {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+    
+    .wall-mockup.minimal .wall-background {
+      background: linear-gradient(135deg, #fefefe 0%, #f8fafc 100%);
+    }
+    
+    /* Artwork Frame Styles */
+    .artwork-frame {
+      position: relative;
+      z-index: 2;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(2deg);
+    }
+    
+    .canvas-frame {
+      border: 1.5rem solid #8b4513;
+      background: #8b4513;
+    }
+    
+    .framed-frame {
+      border: none;
+      background: #2d3748;
+      padding: 2rem;
+    }
+    
+    .frame-border {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      border: 3px solid #d4af37;
+      border-radius: 0.25rem;
+      z-index: 1;
+    }
+    
+    .metal-frame {
+      border: none;
+      background: linear-gradient(135deg, #e2e8f0, #cbd5e1);
+      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+    }
+    
+    .poster-frame {
+      border: 1px solid #e2e8f0;
+      background: #fff;
+      padding: 1rem;
+    }
+    
+    .artwork-image {
+      width: 200px;
+      height: 250px;
+      object-fit: cover;
+      border-radius: 0.25rem;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .metal-shine {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+      z-index: 3;
+      animation: metalShine 3s ease-in-out infinite;
+    }
+    
+    @keyframes metalShine {
+      0%, 100% { transform: translateX(-100%); }
+      50% { transform: translateX(100%); }
+    }
+    
+    /* Room Elements */
+    .room-elements {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 30%;
+      z-index: 1;
+    }
+    
+    .plant-shadow {
+      position: absolute;
+      bottom: 0;
+      right: 10%;
+      width: 80px;
+      height: 120px;
+      background: radial-gradient(ellipse at bottom, rgba(0, 0, 0, 0.1) 0%, transparent 70%);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    }
+    
+    .furniture-outline {
+      position: absolute;
+      bottom: 0;
+      left: 5%;
+      width: 100px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .modern-furniture {
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      width: 120px;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 0.5rem 0.5rem 0 0;
+    }
+    
+    .minimal-decor {
+      position: absolute;
+      bottom: 0;
+      right: 15%;
+      width: 60px;
+      height: 80px;
+      background: rgba(0, 0, 0, 0.03);
+      border-radius: 50%;
+    }
+    
+    /* Option Details */
+    .option-details {
+      text-align: center;
+      padding: 1.5rem;
+      background: #fff;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .option-details h4 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+    
+    .option-details p {
+      font-size: 1.4rem;
+      color: #64748b;
+      margin-bottom: 1.5rem;
+    }
+    
+    /* Size Options */
+    .size-options {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .size-btn {
+      background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+      border: 2px solid #e2e8f0;
+      padding: 1rem 1.5rem;
+      border-radius: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 1.3rem;
+    }
+    
+    .size-btn:hover {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      border-color: #8B5CF6;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+    
+    .size-btn.selected {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border-color: #10b981;
+    }
+    
+    /* Carousel Navigation */
+    .carousel-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    
+    .nav-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      font-size: 1.8rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .nav-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+    
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    /* Carousel Dots */
+    .carousel-dots {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .dot.active {
+      background: #8B5CF6;
+      transform: scale(1.2);
+    }
+    
+    .dot:hover {
+      background: #a855f7;
+    }
+    
+    /* Add to Cart Section */
+    .add-to-cart-section {
+      margin-top: 3rem;
+      padding: 2rem;
+      background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+      border-radius: 1.5rem;
+      text-align: center;
+      border: 2px solid #bbf7d0;
+    }
+    
+    .selected-option-summary {
+      margin-bottom: 2rem;
+    }
+    
+    .selected-option-summary h3 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #166534;
+      margin-bottom: 0.5rem;
+    }
+    
+    .price-display {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: #059669;
+      margin: 1rem 0;
+    }
+    
+    .add-to-cart-btn {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      border: none;
+      padding: 1.5rem 3rem;
+      border-radius: 1rem;
+      font-size: 1.6rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    }
+    
+    .add-to-cart-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(16, 185, 129, 0.4);
+    }
+    
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+      .pod-enhanced-interface {
+        padding: 1rem;
+      }
+      
+      .carousel-container {
+        height: 500px;
+      }
+      
+      .artwork-image {
+        width: 150px;
+        height: 180px;
+      }
+      
+      .size-options {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .size-btn {
+        width: 100%;
+        max-width: 200px;
+      }
+    }
+  </style>
+
+  <div class="pod-enhanced-header">
+    <h2>🎨 Choose Your Perfect Wall Art</h2>
+    <p>Swipe through different styles and see how your AI-generated art will look in real environments</p>
+  </div>
+
+  <div class="print-options-carousel">
+    <div class="carousel-container">
+      <div class="carousel-track" id="enhancedCarouselTrack">
+        
+        <!-- Canvas Print Slide -->
+        <div class="print-option-slide" data-type="canvas">
+          <div class="mockup-container">
+            <div class="wall-mockup">
+              <div class="wall-background"></div>
+              <div class="artwork-frame canvas-frame">
+                <img id="canvas-preview-enhanced" src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=500&fit=crop" alt="Canvas Preview" class="artwork-image">
+              </div>
+              <div class="room-elements">
+                <div class="plant-shadow"></div>
+                <div class="furniture-outline"></div>
+              </div>
+            </div>
+          </div>
+          <div class="option-details">
+            <h4>🖼️ Gallery Canvas</h4>
+            <p>Museum-quality canvas with gallery-wrap finish, ready to hang</p>
+            <div class="size-options" data-product="canvas">
+              <button class="size-btn" data-size="12x16" data-price="39.98" onclick="selectSize(this, 'canvas', '12x16', 39.98)">12×16" - $39.98</button>
+              <button class="size-btn" data-size="16x20" data-price="59.98" onclick="selectSize(this, 'canvas', '16x20', 59.98)">16×20" - $59.98</button>
+              <button class="size-btn" data-size="18x24" data-price="79.98" onclick="selectSize(this, 'canvas', '18x24', 79.98)">18×24" - $79.98</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Framed Print Slide -->
+        <div class="print-option-slide" data-type="framed">
+          <div class="mockup-container">
+            <div class="wall-mockup">
+              <div class="wall-background"></div>
+              <div class="artwork-frame framed-frame">
+                <div class="frame-border"></div>
+                <img id="framed-preview-enhanced" src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=500&fit=crop" alt="Framed Preview" class="artwork-image">
+              </div>
+              <div class="room-elements">
+                <div class="plant-shadow"></div>
+                <div class="furniture-outline"></div>
+              </div>
+            </div>
+          </div>
+          <div class="option-details">
+            <h4>🖼️ Premium Framed</h4>
+            <p>Professional black frame with museum-quality matting and glass</p>
+            <div class="size-options" data-product="framed">
+              <button class="size-btn" data-size="12x16" data-price="69.96" onclick="selectSize(this, 'framed', '12x16', 69.96)">12×16" - $69.96</button>
+              <button class="size-btn" data-size="16x20" data-price="89.96" onclick="selectSize(this, 'framed', '16x20', 89.96)">16×20" - $89.96</button>
+              <button class="size-btn" data-size="18x24" data-price="109.96" onclick="selectSize(this, 'framed', '18x24', 109.96)">18×24" - $109.96</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Metal Print Slide -->
+        <div class="print-option-slide" data-type="metal">
+          <div class="mockup-container">
+            <div class="wall-mockup modern">
+              <div class="wall-background"></div>
+              <div class="artwork-frame metal-frame">
+                <img id="metal-preview-enhanced" src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=500&fit=crop" alt="Metal Preview" class="artwork-image">
+                <div class="metal-shine"></div>
+              </div>
+              <div class="room-elements">
+                <div class="modern-furniture"></div>
+              </div>
+            </div>
+          </div>
+          <div class="option-details">
+            <h4>⚡ Metal Print</h4>
+            <p>Vibrant colors on aluminum with floating mount system</p>
+            <div class="size-options" data-product="metal">
+              <button class="size-btn" data-size="12x16" data-price="59.96" onclick="selectSize(this, 'metal', '12x16', 59.96)">12×16" - $59.96</button>
+              <button class="size-btn" data-size="16x20" data-price="79.96" onclick="selectSize(this, 'metal', '16x20', 79.96)">16×20" - $79.96</button>
+              <button class="size-btn" data-size="18x24" data-price="99.96" onclick="selectSize(this, 'metal', '18x24', 99.96)">18×24" - $99.96</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Poster Print Slide -->
+        <div class="print-option-slide" data-type="poster">
+          <div class="mockup-container">
+            <div class="wall-mockup minimal">
+              <div class="wall-background"></div>
+              <div class="artwork-frame poster-frame">
+                <img id="poster-preview-enhanced" src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=500&fit=crop" alt="Poster Preview" class="artwork-image">
+              </div>
+              <div class="room-elements">
+                <div class="minimal-decor"></div>
+              </div>
+            </div>
+          </div>
+          <div class="option-details">
+            <h4>📄 Art Poster</h4>
+            <p>High-quality paper print on premium matte finish</p>
+            <div class="size-options" data-product="poster">
+              <button class="size-btn" data-size="12x16" data-price="29.98" onclick="selectSize(this, 'poster', '12x16', 29.98)">12×16" - $29.98</button>
+              <button class="size-btn" data-size="16x20" data-price="39.98" onclick="selectSize(this, 'poster', '16x20', 39.98)">16×20" - $39.98</button>
+              <button class="size-btn" data-size="18x24" data-price="49.98" onclick="selectSize(this, 'poster', '18x24', 49.98)">18×24" - $49.98</button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+    
+    <!-- Carousel Navigation -->
+    <div class="carousel-nav">
+      <button class="nav-btn prev-btn" onclick="previousSlideEnhanced()" id="prevBtnEnhanced">‹</button>
+      <div class="carousel-dots">
+        <span class="dot active" onclick="goToSlideEnhanced(0)"></span>
+        <span class="dot" onclick="goToSlideEnhanced(1)"></span>
+        <span class="dot" onclick="goToSlideEnhanced(2)"></span>
+        <span class="dot" onclick="goToSlideEnhanced(3)"></span>
+      </div>
+      <button class="nav-btn next-btn" onclick="nextSlideEnhanced()" id="nextBtnEnhanced">›</button>
+    </div>
+  </div>
+
+  <!-- Add to Cart Section -->
+  <div class="add-to-cart-section" id="addToCartSection" style="display: none;">
+    <div class="selected-option-summary">
+      <h3 id="selectedOptionTitle">Select an option above</h3>
+      <div class="price-display" id="selectedPrice">$0.00</div>
+      <p id="selectedDetails">Choose your preferred size and format</p>
+    </div>
+    <button class="add-to-cart-btn" onclick="addToCart()" id="addToCartBtn" disabled>
+      Add to Cart
+    </button>
+  </div>
+</div>
+
+<script>
+let currentSlideEnhanced = 0;
+let selectedProduct = null;
+let selectedSize = null;
+let selectedPrice = 0;
+
+// Initialize enhanced carousel
+function initEnhancedCarousel() {
+  updateCarouselEnhanced();
+  
+  // Add touch/swipe support
+  addSwipeSupport();
+}
+
+function updateCarouselEnhanced() {
+  const track = document.getElementById('enhancedCarouselTrack');
+  const dots = document.querySelectorAll('.carousel-dots .dot');
+  const prevBtn = document.getElementById('prevBtnEnhanced');
+  const nextBtn = document.getElementById('nextBtnEnhanced');
+  
+  if (track) {
+    track.style.transform = `translateX(-${currentSlideEnhanced * 25}%)`;
+  }
+  
+  // Update dots
+  dots.forEach((dot, index) => {
+    dot.classList.toggle('active', index === currentSlideEnhanced);
+  });
+  
+  // Update navigation buttons
+  if (prevBtn) prevBtn.disabled = currentSlideEnhanced === 0;
+  if (nextBtn) nextBtn.disabled = currentSlideEnhanced === 3;
+}
+
+function nextSlideEnhanced() {
+  if (currentSlideEnhanced < 3) {
+    currentSlideEnhanced++;
+    updateCarouselEnhanced();
+  }
+}
+
+function previousSlideEnhanced() {
+  if (currentSlideEnhanced > 0) {
+    currentSlideEnhanced--;
+    updateCarouselEnhanced();
+  }
+}
+
+function goToSlideEnhanced(index) {
+  currentSlideEnhanced = index;
+  updateCarouselEnhanced();
+}
+
+// Size selection
+function selectSize(button, product, size, price) {
+  // Remove selection from all size buttons
+  document.querySelectorAll('.size-btn').forEach(btn => {
+    btn.classList.remove('selected');
+  });
+  
+  // Add selection to clicked button
+  button.classList.add('selected');
+  
+  // Update selected values
+  selectedProduct = product;
+  selectedSize = size;
+  selectedPrice = price;
+  
+  // Update add to cart section
+  updateAddToCartSection();
+}
+
+function updateAddToCartSection() {
+  const section = document.getElementById('addToCartSection');
+  const title = document.getElementById('selectedOptionTitle');
+  const priceDisplay = document.getElementById('selectedPrice');
+  const details = document.getElementById('selectedDetails');
+  const addBtn = document.getElementById('addToCartBtn');
+  
+  if (selectedProduct && selectedSize) {
+    section.style.display = 'block';
+    
+    const productNames = {
+      canvas: 'Gallery Canvas Print',
+      framed: 'Premium Framed Print',
+      metal: 'Metal Print',
+      poster: 'Art Poster'
+    };
+    
+    title.textContent = `${productNames[selectedProduct]} - ${selectedSize}"`;
+    priceDisplay.textContent = `$${selectedPrice}`;
+    details.textContent = `Ready to add your custom ${selectedProduct} print to cart`;
+    addBtn.disabled = false;
+    addBtn.textContent = `Add ${productNames[selectedProduct]} to Cart - $${selectedPrice}`;
+  }
+}
+
+// Add to cart functionality
+function addToCart() {
+  if (!selectedProduct || !selectedSize) {
+    alert('Please select a product type and size first.');
+    return;
+  }
+  
+  // Here you would integrate with your cart system
+  alert(`Added to cart: ${selectedProduct} ${selectedSize}" for $${selectedPrice}`);
+  
+  // You can add actual Shopify cart integration here
+  console.log('Adding to cart:', {
+    product: selectedProduct,
+    size: selectedSize,
+    price: selectedPrice
+  });
+}
+
+// Touch/swipe support
+function addSwipeSupport() {
+  const carousel = document.querySelector('.carousel-container');
+  if (!carousel) return;
+  
+  let startX = 0;
+  let isDragging = false;
+  
+  carousel.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    isDragging = true;
+  });
+  
+  carousel.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+  });
+  
+  carousel.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const endX = e.changedTouches[0].clientX;
+    const diffX = startX - endX;
+    
+    if (Math.abs(diffX) > 50) { // Minimum swipe distance
+      if (diffX > 0) {
+        nextSlideEnhanced();
+      } else {
+        previousSlideEnhanced();
+      }
+    }
+  });
+  
+  // Mouse support for desktop
+  carousel.addEventListener('mousedown', (e) => {
+    startX = e.clientX;
+    isDragging = true;
+    carousel.style.cursor = 'grabbing';
+  });
+  
+  carousel.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+  });
+  
+  carousel.addEventListener('mouseup', (e) => {
+    if (!isDragging) return;
+    isDragging = false;
+    carousel.style.cursor = 'grab';
+    
+    const endX = e.clientX;
+    const diffX = startX - endX;
+    
+    if (Math.abs(diffX) > 50) {
+      if (diffX > 0) {
+        nextSlideEnhanced();
+      } else {
+        previousSlideEnhanced();
+      }
+    }
+  });
+  
+  carousel.addEventListener('mouseleave', () => {
+    isDragging = false;
+    carousel.style.cursor = 'grab';
+  });
+}
+
+// Update artwork images when new image is selected
+function updateEnhancedPreviews(imageUrl) {
+  const previewImages = [
+    'canvas-preview-enhanced',
+    'framed-preview-enhanced', 
+    'metal-preview-enhanced',
+    'poster-preview-enhanced'
+  ];
+  
+  previewImages.forEach(id => {
+    const img = document.getElementById(id);
+    if (img) {
+      img.src = imageUrl;
+    }
+  });
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initEnhancedCarousel);
+
+// Global function to activate enhanced interface
+window.activateEnhancedPOD = function(imageUrl) {
+  const interface = document.getElementById('pod-enhanced-interface');
+  const oldInterface = document.getElementById('pod-interface');
+  
+  if (interface) {
+    // Hide old interface
+    if (oldInterface) oldInterface.style.display = 'none';
+    
+    // Show enhanced interface
+    interface.style.display = 'block';
+    
+    // Update all preview images
+    updateEnhancedPreviews(imageUrl);
+    
+    // Scroll to interface
+    interface.scrollIntoView({ behavior: 'smooth' });
+    
+    console.log('Enhanced POD interface activated with image:', imageUrl);
+  }
+};
+</script>

@@ -176,24 +176,24 @@
     <p>Select a sample image to test the print-on-demand interface:</p>
     
     <div class="sample-images">
-      <div class="sample-image" onclick="selectSampleImage(this, 'https://picsum.photos/800/600?random=1')">
-        <img src="https://picsum.photos/300/200?random=1" alt="Sample Art 1">
-        <div class="overlay">Abstract Art Style</div>
+      <div class="sample-image" onclick="selectSampleImage(this, 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=800&h=600&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=300&h=200&fit=crop" alt="Abstract Waves">
+        <div class="overlay">🌊 Abstract Waves</div>
       </div>
       
-      <div class="sample-image" onclick="selectSampleImage(this, 'https://picsum.photos/800/600?random=2')">
-        <img src="https://picsum.photos/300/200?random=2" alt="Sample Art 2">
-        <div class="overlay">Landscape Style</div>
+      <div class="sample-image" onclick="selectSampleImage(this, 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=300&h=200&fit=crop" alt="Geometric Design">
+        <div class="overlay">🔷 Geometric Art</div>
       </div>
       
-      <div class="sample-image" onclick="selectSampleImage(this, 'https://picsum.photos/800/600?random=3')">
-        <img src="https://picsum.photos/300/200?random=3" alt="Sample Art 3">
-        <div class="overlay">Portrait Style</div>
+      <div class="sample-image" onclick="selectSampleImage(this, 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=800&h=600&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=300&h=200&fit=crop" alt="Color Splash">
+        <div class="overlay">🎨 Color Splash</div>
       </div>
       
-      <div class="sample-image" onclick="selectSampleImage(this, 'https://picsum.photos/800/600?random=4')">
-        <img src="https://picsum.photos/300/200?random=4" alt="Sample Art 4">
-        <div class="overlay">Modern Art Style</div>
+      <div class="sample-image" onclick="selectSampleImage(this, 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=200&fit=crop" alt="Mountain Landscape">
+        <div class="overlay">🏔️ Mountain Art</div>
       </div>
     </div>
   </div>
@@ -203,8 +203,8 @@
     <h2>🖨️ Print-on-Demand Interface</h2>
     <p>This is your actual POD interface. Select a sample image above to activate it:</p>
     
-    <!-- Include the actual POD interface -->
-    {% render 'pod-interface' %}
+    <!-- Include the enhanced POD interface with swipeable gallery -->
+    {% render 'pod-interface-enhanced' %}
     
     <!-- Load test scripts -->
     <script src="{{ 'printful-offline-tester.js' | asset_url }}" defer="defer"></script>
@@ -399,7 +399,7 @@ async function testMockupGeneration() {
   }
 }
 
-// Select sample image and activate POD interface
+// Select sample image and activate enhanced POD interface
 function selectSampleImage(element, imageUrl) {
   // Remove previous selection
   document.querySelectorAll('.sample-image').forEach(img => {
@@ -409,13 +409,20 @@ function selectSampleImage(element, imageUrl) {
   // Select current image
   element.classList.add('selected');
   
-  // Activate POD interface with sample image
-  if (window.showPODInterface) {
-    window.showPODInterface(imageUrl);
+  // Activate enhanced POD interface with sample image
+  if (window.activateEnhancedPOD) {
+    window.activateEnhancedPOD(imageUrl);
+  } else {
+    // Fallback to old interface
+    if (window.showPODInterface) {
+      window.showPODInterface(imageUrl);
+    }
   }
   
   // Update pricing preview
   updatePricingPreview();
+  
+  console.log('Selected sample image for enhanced POD:', imageUrl);
 }
 
 // Update pricing preview
