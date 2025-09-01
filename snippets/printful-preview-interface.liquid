@@ -159,9 +159,9 @@
     </div>
     
     <div class="test-buttons">
-      <button class="test-btn" onclick="testAPIConnection()">Test API Connection</button>
-      <button class="test-btn" onclick="fetchProductCatalog()">Fetch Product Catalog</button>
-      <button class="test-btn" onclick="testMockupGeneration()">Test Mockup Generation</button>
+      <button class="test-btn" onclick="testPrintfulOffline()" style="background: linear-gradient(135deg, #10b981, #059669);">🧪 Test Integration (Offline)</button>
+      <button class="test-btn" onclick="testAPIConnection()" style="opacity: 0.6;" title="Will show CORS error (expected)">🌐 Test API (Shows CORS)</button>
+      <button class="test-btn" onclick="validatePricingDemo()" style="background: linear-gradient(135deg, #f59e0b, #d97706);">💰 Validate Pricing</button>
     </div>
     
     <div id="test-results" class="test-results" style="display: none;">
@@ -207,6 +207,7 @@
     {% render 'pod-interface' %}
     
     <!-- Load test scripts -->
+    <script src="{{ 'printful-offline-tester.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'printful-status-checker.js' | asset_url }}" defer="defer"></script>
     <script src="{{ 'printful-test.js' | asset_url }}" defer="defer"></script>
   </div>
@@ -222,8 +223,15 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Test API connection on page load
-  setTimeout(testAPIConnection, 1000);
+  // Test integration offline on page load (avoids CORS issues)
+  setTimeout(function() {
+    if (typeof testPrintfulOffline === 'function') {
+      testPrintfulOffline();
+    } else {
+      // Fallback to API test if offline tester not loaded
+      testAPIConnection();
+    }
+  }, 1000);
   
   // Initialize pricing preview
   updatePricingPreview();

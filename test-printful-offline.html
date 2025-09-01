@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Printful Integration Test - Offline</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: #f8fafc;
+        }
+        
+        .test-container {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .test-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: transform 0.2s;
+        }
+        
+        .test-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .test-button.secondary {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+        
+        .results {
+            background: #f8f9fa;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border-left: 4px solid #10b981;
+            font-family: monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .status {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            font-weight: 600;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🧪 Printful Integration Test (Local)</h1>
+        <p>This page tests your Printful integration without making API calls, avoiding CORS issues.</p>
+        
+        <div id="status" class="status warning">
+            Ready to test...
+        </div>
+        
+        <div>
+            <button class="test-button" onclick="runOfflineTests()">🧪 Run All Tests</button>
+            <button class="test-button secondary" onclick="testCredentials()">🔑 Test Credentials</button>
+            <button class="test-button secondary" onclick="testPricing()">💰 Test Pricing</button>
+            <button class="test-button secondary" onclick="showConfig()">⚙️ Show Config</button>
+        </div>
+        
+        <div id="results" class="results" style="display: none;"></div>
+    </div>
+
+    <!-- Include your Printful files -->
+    <script src="assets/printful-credentials.js"></script>
+    <script src="assets/printful-offline-tester.js"></script>
+
+    <script>
+        // Test functions
+        async function runOfflineTests() {
+            const statusDiv = document.getElementById('status');
+            const resultsDiv = document.getElementById('results');
+            
+            statusDiv.className = 'status warning';
+            statusDiv.innerHTML = '🔄 Running offline tests...';
+            
+            resultsDiv.style.display = 'block';
+            resultsDiv.innerHTML = 'Starting tests...\n';
+            
+            try {
+                if (!window.PrintfulOfflineTester) {
+                    throw new Error('PrintfulOfflineTester not loaded');
+                }
+                
+                const tester = new window.PrintfulOfflineTester();
+                const summary = await tester.runAllTests();
+                
+                if (summary.passRate === 100) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = `✅ All tests passed! (${summary.passed}/${summary.total})`;
+                } else {
+                    statusDiv.className = 'status warning';
+                    statusDiv.innerHTML = `⚠️ ${summary.failed} tests failed (${summary.passRate}% passed)`;
+                }
+                
+                // Show detailed results
+                resultsDiv.innerHTML = `
+Test Summary: ${summary.passed}/${summary.total} passed (${summary.passRate}%)
+
+Detailed Results:
+${summary.results.map(r => `${r.passed ? '✅' : '❌'} ${r.name}: ${r.result}`).join('\n')}
+                `;
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = `❌ Test failed: ${error.message}`;
+                resultsDiv.innerHTML = `Error: ${error.message}\n\nStack: ${error.stack}`;
+            }
+        }
+        
+        function testCredentials() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            try {
+                if (!window.PrintfulCredentials) {
+                    throw new Error('PrintfulCredentials not loaded');
+                }
+                
+                const isConfigured = window.PrintfulCredentials.isConfigured();
+                const apiKey = window.PrintfulCredentials.api_key;
+                
+                resultsDiv.innerHTML = `
+Credentials Test:
+✅ PrintfulCredentials loaded: Yes
+✅ API Key configured: ${isConfigured ? 'Yes' : 'No'}
+✅ API Key format: ${apiKey?.substring(0, 8)}...${apiKey?.substring(apiKey.length - 4)}
+✅ Test mode: ${window.PrintfulCredentials.test_mode ? 'Enabled (Safe)' : 'Disabled'}
+✅ Markup: ${window.PrintfulCredentials.markup_percentage}%
+✅ Shopify integration: ${window.PrintfulCredentials.shopify_integration?.enabled ? 'Enabled' : 'Disabled'}
+                `;
+                
+                document.getElementById('status').className = 'status success';
+                document.getElementById('status').innerHTML = '✅ Credentials test passed';
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `❌ Credentials test failed: ${error.message}`;
+                document.getElementById('status').className = 'status error';
+                document.getElementById('status').innerHTML = '❌ Credentials test failed';
+            }
+        }
+        
+        function testPricing() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            const markup = window.PrintfulCredentials?.markup_percentage || 100;
+            const testPrices = [
+                { product: 'Canvas 12x16"', cost: 19.99 },
+                { product: 'Metal Print 16x20"', cost: 29.95 },
+                { product: 'Framed Print 18x24"', cost: 49.50 }
+            ];
+            
+            let output = `Pricing Test (${markup}% markup):\n\n`;
+            
+            for (const item of testPrices) {
+                const customerPrice = (item.cost * (1 + markup / 100)).toFixed(2);
+                const profit = (customerPrice - item.cost).toFixed(2);
+                output += `${item.product}:\n`;
+                output += `  Cost: $${item.cost}\n`;
+                output += `  Customer Price: $${customerPrice}\n`;
+                output += `  Your Profit: $${profit}\n\n`;
+            }
+            
+            resultsDiv.innerHTML = output;
+            document.getElementById('status').className = 'status success';
+            document.getElementById('status').innerHTML = '✅ Pricing calculations verified';
+        }
+        
+        function showConfig() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.style.display = 'block';
+            
+            if (!window.PrintfulCredentials) {
+                resultsDiv.innerHTML = '❌ PrintfulCredentials not loaded';
+                return;
+            }
+            
+            const config = {
+                api_key: window.PrintfulCredentials.api_key ? 
+                    `${window.PrintfulCredentials.api_key.substring(0, 8)}...${window.PrintfulCredentials.api_key.substring(window.PrintfulCredentials.api_key.length - 4)}` : 
+                    'Not configured',
+                test_mode: window.PrintfulCredentials.test_mode,
+                markup_percentage: window.PrintfulCredentials.markup_percentage,
+                shopify_integration: window.PrintfulCredentials.shopify_integration,
+                endpoints: window.PrintfulCredentials.endpoints
+            };
+            
+            resultsDiv.innerHTML = `Current Configuration:\n\n${JSON.stringify(config, null, 2)}`;
+            document.getElementById('status').className = 'status success';
+            document.getElementById('status').innerHTML = '✅ Configuration displayed';
+        }
+        
+        // Auto-run basic test on page load
+        window.addEventListener('load', function() {
+            setTimeout(testCredentials, 500);
+        });
+    </script>
+</body>
+</html>
