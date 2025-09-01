@@ -1,25 +1,109 @@
 {
   "sections": {
-    "main": {
-      "type": "apps",
+    "create_hero": {
+      "type": "rich-text",
       "blocks": {
-        "piccatso_tool_upload_picker_create": {
-          "type": "shopify://apps/piccatso-tool/blocks/upload_picker/d220211d-db7d-40be-8645-fc17888bb8ee",
+        "heading": {
+          "type": "heading",
           "settings": {
-            "heading": "Create your art"
+            "heading": "Create Your AI Masterpiece",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Upload your photo and watch it transform into stunning art in your chosen style. Ready in seconds, printed on museum-quality materials.</p>"
           }
         }
       },
       "block_order": [
-        "piccatso_tool_upload_picker_create"
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 60,
+        "padding_bottom": 20
+      }
+    },
+    "piccatso_creator": {
+      "type": "apps",
+      "blocks": {
+        "piccatso_tool_upload_picker": {
+          "type": "shopify://apps/piccatso-tool/blocks/upload_picker/d220211d-db7d-40be-8645-fc17888bb8ee",
+          "settings": {
+            "heading": ""
+          }
+        }
+      },
+      "block_order": [
+        "piccatso_tool_upload_picker"
       ],
       "settings": {
         "include_margins": true
       }
+    },
+    "creation_steps": {
+      "type": "multicolumn",
+      "blocks": {
+        "step1": {
+          "type": "column",
+          "settings": {
+            "title": "1. Upload Your Photo",
+            "text": "<p>Choose any photo from your device. Works best with clear, well-lit images.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "step2": {
+          "type": "column",
+          "settings": {
+            "title": "2. Choose Your Style",
+            "text": "<p>Browse through our curated collection of artistic styles and see instant previews.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        },
+        "step3": {
+          "type": "column",
+          "settings": {
+            "title": "3. Select Format & Order",
+            "text": "<p>Pick your preferred size and material, then add to cart for premium printing.</p>",
+            "link_label": "",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "step1",
+        "step2",
+        "step3"
+      ],
+      "settings": {
+        "title": "Simple 3-Step Process",
+        "heading_size": "h2",
+        "image_width": "third",
+        "image_ratio": "adapt",
+        "button_label": "",
+        "button_link": "",
+        "columns_desktop": 3,
+        "column_alignment": "center",
+        "background_style": "none",
+        "color_scheme": "scheme-2",
+        "columns_mobile": "1",
+        "swipe_on_mobile": false,
+        "padding_top": 40,
+        "padding_bottom": 60
+      }
     }
   },
   "order": [
-    "main"
+    "create_hero",
+    "piccatso_creator",
+    "creation_steps"
   ]
 }
-
