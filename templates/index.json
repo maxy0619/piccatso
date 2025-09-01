@@ -142,11 +142,20 @@
           "settings": {
             "text": "<p>Each piece is printed on archival paper with professional-grade inks, ensuring your AI-generated art looks stunning for years to come.</p>"
           }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_label": "🧪 Test Printful Integration",
+            "button_link": "/pages/printful-preview",
+            "button_style_secondary": false
+          }
         }
       },
       "block_order": [
         "heading",
-        "text"
+        "text",
+        "button"
       ],
       "settings": {
         "desktop_content_position": "center",
