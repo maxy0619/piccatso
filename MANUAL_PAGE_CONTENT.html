@@ -1,0 +1,237 @@
+<!-- Copy this HTML into your Shopify page content if the template doesn't work -->
+
+<div class="printful-preview-container">
+  <style>
+    .printful-preview-container {
+      max-width: 120rem;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .preview-section {
+      background: white;
+      border-radius: 1.6rem;
+      padding: 3rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e5e5e5;
+    }
+    
+    .section-title {
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin-bottom: 2rem;
+      color: #1a1a1a;
+      text-align: center;
+    }
+    
+    .api-status {
+      padding: 1.5rem;
+      border-radius: 0.8rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      font-weight: 600;
+    }
+    
+    .status-checking {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+    
+    .sample-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .sample-image {
+      cursor: pointer;
+      border-radius: 1rem;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+      border: 3px solid transparent;
+    }
+    
+    .sample-image:hover {
+      transform: scale(1.05);
+      border-color: #6366f1;
+    }
+    
+    .sample-image.selected {
+      border-color: #10b981;
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    
+    .sample-image img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+    
+    .test-button {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 1.2rem 2.4rem;
+      border-radius: 0.8rem;
+      font-size: 1.6rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 1rem;
+    }
+    
+    .test-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+    }
+    
+    .test-results {
+      background: #f8f9fa;
+      border-radius: 0.8rem;
+      padding: 2rem;
+      margin-top: 2rem;
+      border-left: 4px solid #6366f1;
+    }
+  </style>
+
+  <!-- API Status Section -->
+  <div class="preview-section">
+    <h2 class="section-title">🔌 API Connection Status</h2>
+    <div id="api-status" class="api-status status-checking">
+      Checking Printful API connection...
+    </div>
+    <div class="text-center">
+      <button onclick="testPrintfulAPIConnection()" class="test-button">
+        🧪 Test API Connection
+      </button>
+      <button onclick="fetchPrintfulCatalog()" class="test-button">
+        📦 Fetch Product Catalog
+      </button>
+    </div>
+    <div id="api-results" class="test-results" style="display: none;"></div>
+  </div>
+
+  <!-- Sample Images Section -->
+  <div class="preview-section">
+    <h2 class="section-title">🎨 Sample Images for Testing</h2>
+    <p style="text-align: center; margin-bottom: 2rem; color: #666;">
+      Click any image below to activate the Print-on-Demand interface
+    </p>
+    
+    <div class="sample-images">
+      <div class="sample-image" onclick="activatePODWithSampleImage(this, 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=500&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=500&h=500&fit=crop" alt="Abstract Art 1">
+        <div style="padding: 1rem; text-align: center;">
+          <strong>Abstract Waves</strong>
+        </div>
+      </div>
+      
+      <div class="sample-image" onclick="activatePODWithSampleImage(this, 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=500&h=500&fit=crop" alt="Abstract Art 2">
+        <div style="padding: 1rem; text-align: center;">
+          <strong>Geometric Design</strong>
+        </div>
+      </div>
+      
+      <div class="sample-image" onclick="activatePODWithSampleImage(this, 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=500&h=500&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=500&h=500&fit=crop" alt="Abstract Art 3">
+        <div style="padding: 1rem; text-align: center;">
+          <strong>Color Splash</strong>
+        </div>
+      </div>
+      
+      <div class="sample-image" onclick="activatePODWithSampleImage(this, 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop')">
+        <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop" alt="Abstract Art 4">
+        <div style="padding: 1rem; text-align: center;">
+          <strong>Mountain Landscape</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- POD Interface Section -->
+  <div class="preview-section" id="pod-interface-section" style="display: none;">
+    <h2 class="section-title">🖨️ Print-on-Demand Interface</h2>
+    <div id="pod-interface-container">
+      <!-- POD interface will be loaded here -->
+      {% render 'pod-interface' %}
+    </div>
+  </div>
+
+  <!-- Pricing Preview Section -->
+  <div class="preview-section">
+    <h2 class="section-title">💰 Pricing Preview</h2>
+    <p style="text-align: center; margin-bottom: 2rem;">
+      All prices shown include 100% markup for maximum profitability
+    </p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+      <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; text-align: center;">
+        <h3>Canvas Prints</h3>
+        <p><strong>12x16"</strong>: $39.98 → <span style="color: #10b981; font-weight: bold;">$79.96</span></p>
+        <p><strong>16x20"</strong>: $49.98 → <span style="color: #10b981; font-weight: bold;">$99.96</span></p>
+        <p><strong>18x24"</strong>: $59.98 → <span style="color: #10b981; font-weight: bold;">$119.96</span></p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; text-align: center;">
+        <h3>Metal Prints</h3>
+        <p><strong>12x16"</strong>: $29.98 → <span style="color: #10b981; font-weight: bold;">$59.96</span></p>
+        <p><strong>16x20"</strong>: $39.98 → <span style="color: #10b981; font-weight: bold;">$79.96</span></p>
+        <p><strong>18x24"</strong>: $49.98 → <span style="color: #10b981; font-weight: bold;">$99.96</span></p>
+      </div>
+      
+      <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; text-align: center;">
+        <h3>Framed Prints</h3>
+        <p><strong>12x16"</strong>: $34.98 → <span style="color: #10b981; font-weight: bold;">$69.96</span></p>
+        <p><strong>16x20"</strong>: $44.98 → <span style="color: #10b981; font-weight: bold;">$89.96</span></p>
+        <p><strong>18x24"</strong>: $54.98 → <span style="color: #10b981; font-weight: bold;">$109.96</span></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Include the test JavaScript -->
+<script src="{{ 'printful-credentials.js' | asset_url }}"></script>
+<script src="{{ 'printful-test.js' | asset_url }}"></script>
+
+<script>
+// Auto-run API test when page loads
+document.addEventListener('DOMContentLoaded', function() {
+  // Wait a moment for assets to load
+  setTimeout(function() {
+    if (typeof testPrintfulIntegration === 'function') {
+      testPrintfulIntegration();
+    } else {
+      console.log('Printful test functions not loaded yet');
+    }
+  }, 1000);
+});
+
+// Sample image activation function
+function activatePODWithSampleImage(element, imageUrl) {
+  // Remove selected class from all images
+  document.querySelectorAll('.sample-image').forEach(img => {
+    img.classList.remove('selected');
+  });
+  
+  // Add selected class to clicked image
+  element.classList.add('selected');
+  
+  // Show POD interface section
+  const podSection = document.getElementById('pod-interface-section');
+  if (podSection) {
+    podSection.style.display = 'block';
+    podSection.scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  // Call the actual POD activation function if it exists
+  if (typeof activatePODWithSampleImage === 'function' && window.activatePODWithSampleImage !== activatePODWithSampleImage) {
+    window.activatePODWithSampleImage(imageUrl);
+  }
+  
+  console.log('Activated POD interface with sample image:', imageUrl);
+}
+</script>
