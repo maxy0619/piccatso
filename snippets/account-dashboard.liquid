@@ -1,0 +1,865 @@
+{% comment %}
+  Piccatso Account Dashboard
+  Displays user's subscription, artwork, cart, and account management
+{% endcomment %}
+
+<div class="account-dashboard" id="account-dashboard">
+  <style>
+    .account-dashboard {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .dashboard-nav {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 3rem;
+      border-bottom: 2px solid #e2e8f0;
+      overflow-x: auto;
+    }
+    
+    .nav-tab {
+      padding: 1rem 2rem;
+      background: none;
+      border: none;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #64748b;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+    
+    .nav-tab.active {
+      color: #8B5CF6;
+      border-bottom-color: #8B5CF6;
+    }
+    
+    .nav-tab:hover {
+      color: #8B5CF6;
+    }
+    
+    .dashboard-content {
+      display: none;
+    }
+    
+    .dashboard-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+    
+    .dashboard-card {
+      background: white;
+      border-radius: 1.5rem;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid #f1f5f9;
+    }
+    
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+    }
+    
+    .card-icon.primary { background: linear-gradient(135deg, #8B5CF6, #A855F7); }
+    .card-icon.success { background: linear-gradient(135deg, #10b981, #059669); }
+    .card-icon.warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+    .card-icon.info { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+    
+    .card-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+    
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 0.8rem;
+    }
+    
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #8B5CF6;
+    }
+    
+    .stat-label {
+      font-size: 1.2rem;
+      color: #64748b;
+      margin-top: 0.5rem;
+    }
+    
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 1rem 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #8B5CF6, #A855F7);
+      transition: width 0.5s ease;
+    }
+    
+    .subscription-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    
+    .badge-free { background: #f1f5f9; color: #64748b; }
+    .badge-premium { background: #fef3c7; color: #92400e; }
+    .badge-pro { background: #d1fae5; color: #065f46; }
+    
+    .action-button {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      border: none;
+      padding: 1rem 2rem;
+      border-radius: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      width: 100%;
+      margin-top: 1rem;
+    }
+    
+    .action-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+    
+    .action-button.secondary {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    
+    .action-button.secondary:hover {
+      background: #e2e8f0;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .artwork-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    
+    .artwork-item {
+      position: relative;
+      border-radius: 1rem;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      background: #f8fafc;
+      aspect-ratio: 1;
+    }
+    
+    .artwork-item:hover {
+      transform: scale(1.05);
+    }
+    
+    .artwork-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .artwork-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+      color: white;
+      padding: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    .cart-item {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      background: #f8fafc;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .cart-item-image {
+      width: 80px;
+      height: 80px;
+      border-radius: 0.5rem;
+      object-fit: cover;
+    }
+    
+    .cart-item-details {
+      flex: 1;
+    }
+    
+    .cart-item-title {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    
+    .cart-item-price {
+      color: #10b981;
+      font-weight: 700;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: #64748b;
+    }
+    
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+      .account-dashboard {
+        padding: 1rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .dashboard-nav {
+        flex-wrap: wrap;
+      }
+    }
+  </style>
+
+  <!-- Dashboard Navigation -->
+  <div class="dashboard-nav">
+    <button class="nav-tab active" onclick="showDashboardTab('overview')">📊 Overview</button>
+    <button class="nav-tab" onclick="showDashboardTab('artwork')">🎨 My Artwork</button>
+    <button class="nav-tab" onclick="showDashboardTab('cart')">🛒 Shopping Cart</button>
+    <button class="nav-tab" onclick="showDashboardTab('orders')">📦 Orders</button>
+    <button class="nav-tab" onclick="showDashboardTab('settings')">👤 Settings</button>
+  </div>
+
+  <!-- Overview Tab -->
+  <div class="dashboard-content active" id="overview-content">
+    <div class="dashboard-grid">
+      
+      <!-- Subscription Status Card -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon primary">⭐</div>
+          <div class="card-title">Subscription Status</div>
+        </div>
+        <div class="subscription-badge badge-free" id="subscription-badge">
+          🆓 Free Tier
+        </div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="generations-used">0</div>
+            <div class="stat-label">Used This Month</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="generations-limit">10</div>
+            <div class="stat-label">Monthly Limit</div>
+          </div>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="usage-progress" style="width: 0%"></div>
+        </div>
+        <button class="action-button" onclick="showUpgradeModal()">
+          Upgrade Subscription
+        </button>
+      </div>
+      
+      <!-- Quick Stats Card -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon success">📈</div>
+          <div class="card-title">Quick Stats</div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-item">
+            <div class="stat-value" id="total-artworks">0</div>
+            <div class="stat-label">Total Artworks</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="total-prints">0</div>
+            <div class="stat-label">Prints Ordered</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="cart-items">0</div>
+            <div class="stat-label">Cart Items</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="favorites-count">0</div>
+            <div class="stat-label">Favorites</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Recent Activity Card -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon info">🕒</div>
+          <div class="card-title">Recent Activity</div>
+        </div>
+        <div id="recent-activity">
+          <div class="empty-state">
+            <div class="empty-state-icon">🎨</div>
+            <p>No recent activity yet.<br>Start creating some AI art!</p>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- My Artwork Tab -->
+  <div class="dashboard-content" id="artwork-content">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <div class="card-icon primary">🎨</div>
+        <div class="card-title">My Artwork Collection</div>
+      </div>
+      
+      <!-- Artwork Filters -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <button class="action-button secondary" onclick="filterArtwork('all')">All</button>
+        <button class="action-button secondary" onclick="filterArtwork('recent')">Recent</button>
+        <button class="action-button secondary" onclick="filterArtwork('favorites')">Favorites</button>
+        <button class="action-button secondary" onclick="filterArtwork('prints')">Ready to Print</button>
+      </div>
+      
+      <!-- Artwork Grid -->
+      <div class="artwork-grid" id="artwork-grid">
+        <div class="empty-state">
+          <div class="empty-state-icon">🎨</div>
+          <p>No artwork saved yet.<br>Create your first AI masterpiece!</p>
+          <button class="action-button" onclick="window.location.href='/pages/create'">
+            Create AI Art
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shopping Cart Tab -->
+  <div class="dashboard-content" id="cart-content">
+    <div class="dashboard-grid">
+      
+      <!-- Current Cart -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon warning">🛒</div>
+          <div class="card-title">Current Cart</div>
+        </div>
+        <div id="current-cart-items">
+          <div class="empty-state">
+            <div class="empty-state-icon">🛒</div>
+            <p>Your cart is empty.<br>Add some prints to get started!</p>
+          </div>
+        </div>
+        <button class="action-button" onclick="window.location.href='/cart'">
+          View Full Cart
+        </button>
+      </div>
+      
+      <!-- Saved for Later -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon info">💾</div>
+          <div class="card-title">Saved for Later</div>
+        </div>
+        <div id="saved-items">
+          <div class="empty-state">
+            <div class="empty-state-icon">💾</div>
+            <p>No items saved for later.</p>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+  <!-- Orders Tab -->
+  <div class="dashboard-content" id="orders-content">
+    <div class="dashboard-card">
+      <div class="card-header">
+        <div class="card-icon success">📦</div>
+        <div class="card-title">Order History</div>
+      </div>
+      <div id="order-history">
+        <div class="empty-state">
+          <div class="empty-state-icon">📦</div>
+          <p>No orders yet.<br>Your print orders will appear here!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Tab -->
+  <div class="dashboard-content" id="settings-content">
+    <div class="dashboard-grid">
+      
+      <!-- Account Settings -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon primary">👤</div>
+          <div class="card-title">Account Settings</div>
+        </div>
+        <div style="space-y: 1rem;">
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email Address</label>
+            <input type="email" id="user-email" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" readonly>
+          </div>
+          <div>
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Display Name</label>
+            <input type="text" id="user-name" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
+          </div>
+        </div>
+        <button class="action-button" onclick="updateAccountSettings()">
+          Update Settings
+        </button>
+      </div>
+      
+      <!-- Subscription Management -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon warning">💳</div>
+          <div class="card-title">Subscription Management</div>
+        </div>
+        <div id="subscription-details">
+          <p style="margin-bottom: 1rem;">Current Plan: <strong id="current-plan">Free Tier</strong></p>
+          <p style="margin-bottom: 1rem;">Next Billing: <span id="next-billing">No billing scheduled</span></p>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="action-button" onclick="showUpgradeModal()">
+            Upgrade Plan
+          </button>
+          <button class="action-button secondary" onclick="manageBilling()">
+            Manage Billing
+          </button>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+
+</div>
+
+<!-- Upgrade Modal -->
+<div id="upgrade-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: white; border-radius: 1.5rem; padding: 3rem; max-width: 500px; width: 90%;">
+    <h2 style="text-align: center; margin-bottom: 2rem;">Upgrade Your Subscription</h2>
+    
+    <div style="space-y: 1.5rem;">
+      <!-- Premium Tier Option -->
+      <div style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem; cursor: pointer;" onclick="selectPlan('premium')">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3>⭐ Premium</h3>
+          <span style="font-size: 2rem; font-weight: 800; color: #8B5CF6;">$9.99/mo</span>
+        </div>
+        <ul style="list-style: none; padding: 0;">
+          <li>✅ 100 generations per month</li>
+          <li>✅ Art history (50 creations)</li>
+          <li>✅ High resolution (1024x1024px)</li>
+          <li>✅ Priority processing</li>
+        </ul>
+      </div>
+      
+      <!-- Pro Tier Option -->
+      <div style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem; cursor: pointer;" onclick="selectPlan('pro')">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h3>🎨 Pro</h3>
+          <span style="font-size: 2rem; font-weight: 800; color: #10b981;">$39.99/mo</span>
+        </div>
+        <ul style="list-style: none; padding: 0;">
+          <li>✅ 1000 generations per month</li>
+          <li>✅ Unlimited art history</li>
+          <li>✅ Ultra HD (2048x2048px)</li>
+          <li>✅ Clean downloads (no watermark)</li>
+          <li>✅ 10% print discount</li>
+          <li>✅ Commercial usage rights</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+      <button class="action-button secondary" onclick="closeUpgradeModal()" style="flex: 1;">
+        Cancel
+      </button>
+      <button class="action-button" onclick="processPlanUpgrade()" style="flex: 1;">
+        Upgrade Now
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Dashboard functionality
+let currentUser = {
+  tier: 'free',
+  generationsUsed: 0,
+  generationsLimit: 10,
+  artworks: [],
+  cartItems: [],
+  orders: [],
+  email: '',
+  name: ''
+};
+
+let selectedPlan = null;
+
+// Initialize dashboard
+function initializeDashboard() {
+  loadUserData();
+  updateDashboardStats();
+  loadRecentActivity();
+}
+
+// Tab switching
+function showDashboardTab(tabName) {
+  // Update nav tabs
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Update content
+  document.querySelectorAll('.dashboard-content').forEach(content => {
+    content.classList.remove('active');
+  });
+  document.getElementById(tabName + '-content').classList.add('active');
+  
+  // Load tab-specific data
+  switch(tabName) {
+    case 'artwork':
+      loadArtworkCollection();
+      break;
+    case 'cart':
+      loadCartItems();
+      break;
+    case 'orders':
+      loadOrderHistory();
+      break;
+    case 'settings':
+      loadAccountSettings();
+      break;
+  }
+}
+
+// Load user data from Shopify customer
+function loadUserData() {
+  // This would integrate with Shopify customer data
+  if (typeof customer !== 'undefined' && customer) {
+    currentUser.email = customer.email || '';
+    currentUser.name = customer.first_name + ' ' + customer.last_name || '';
+    
+    // Load subscription tier from customer tags or metafields
+    if (customer.tags) {
+      if (customer.tags.includes('premium')) currentUser.tier = 'premium';
+      if (customer.tags.includes('pro')) currentUser.tier = 'pro';
+    }
+  }
+  
+  // Load usage data from localStorage for demo
+  const savedData = localStorage.getItem('piccatso_user_data');
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    currentUser = { ...currentUser, ...data };
+  }
+}
+
+// Update dashboard statistics
+function updateDashboardStats() {
+  // Update subscription badge
+  const badge = document.getElementById('subscription-badge');
+  const usageProgress = document.getElementById('usage-progress');
+  
+  switch(currentUser.tier) {
+    case 'premium':
+      badge.textContent = '⭐ Premium Tier';
+      badge.className = 'subscription-badge badge-premium';
+      currentUser.generationsLimit = 100;
+      break;
+    case 'pro':
+      badge.textContent = '🎨 Pro Tier';
+      badge.className = 'subscription-badge badge-pro';
+      currentUser.generationsLimit = 1000;
+      break;
+    default:
+      badge.textContent = '🆓 Free Tier';
+      badge.className = 'subscription-badge badge-free';
+      currentUser.generationsLimit = 10;
+  }
+  
+  // Update usage stats
+  document.getElementById('generations-used').textContent = currentUser.generationsUsed;
+  document.getElementById('generations-limit').textContent = currentUser.generationsLimit;
+  
+  const usagePercent = (currentUser.generationsUsed / currentUser.generationsLimit) * 100;
+  usageProgress.style.width = Math.min(usagePercent, 100) + '%';
+  
+  // Update quick stats
+  document.getElementById('total-artworks').textContent = currentUser.artworks.length;
+  document.getElementById('total-prints').textContent = currentUser.orders.length;
+  document.getElementById('cart-items').textContent = currentUser.cartItems.length;
+  document.getElementById('favorites-count').textContent = currentUser.artworks.filter(a => a.favorite).length;
+}
+
+// Load recent activity
+function loadRecentActivity() {
+  const activityContainer = document.getElementById('recent-activity');
+  
+  // Mock recent activity data
+  const activities = [
+    { type: 'creation', text: 'Created "Abstract Waves"', time: '2 hours ago' },
+    { type: 'print', text: 'Ordered canvas print', time: '1 day ago' },
+    { type: 'favorite', text: 'Added artwork to favorites', time: '3 days ago' }
+  ];
+  
+  if (activities.length === 0) {
+    activityContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎨</div>
+        <p>No recent activity yet.<br>Start creating some AI art!</p>
+      </div>
+    `;
+  } else {
+    activityContainer.innerHTML = activities.map(activity => `
+      <div style="padding: 1rem; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
+        <span>${activity.text}</span>
+        <span style="color: #64748b; font-size: 1.2rem;">${activity.time}</span>
+      </div>
+    `).join('');
+  }
+}
+
+// Load artwork collection
+function loadArtworkCollection() {
+  const artworkGrid = document.getElementById('artwork-grid');
+  
+  if (currentUser.tier === 'free') {
+    artworkGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔒</div>
+        <p>Artwork history is not available on the Free tier.<br>Upgrade to Premium to save your creations!</p>
+        <button class="action-button" onclick="showUpgradeModal()">
+          Upgrade to Premium
+        </button>
+      </div>
+    `;
+    return;
+  }
+  
+  if (currentUser.artworks.length === 0) {
+    artworkGrid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🎨</div>
+        <p>No artwork saved yet.<br>Create your first AI masterpiece!</p>
+        <button class="action-button" onclick="window.location.href='/pages/create'">
+          Create AI Art
+        </button>
+      </div>
+    `;
+  } else {
+    artworkGrid.innerHTML = currentUser.artworks.map(artwork => `
+      <div class="artwork-item" onclick="viewArtwork('${artwork.id}')">
+        <img src="${artwork.image}" alt="${artwork.title}" class="artwork-image">
+        <div class="artwork-overlay">
+          <div>${artwork.title}</div>
+          <div style="font-size: 1rem; opacity: 0.8;">${artwork.date}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// Load cart items
+function loadCartItems() {
+  const cartContainer = document.getElementById('current-cart-items');
+  const savedContainer = document.getElementById('saved-items');
+  
+  // Load current cart from Shopify
+  fetch('/cart.js')
+    .then(response => response.json())
+    .then(cart => {
+      if (cart.items.length === 0) {
+        cartContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🛒</div>
+            <p>Your cart is empty.<br>Add some prints to get started!</p>
+          </div>
+        `;
+      } else {
+        cartContainer.innerHTML = cart.items.map(item => `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.title}" class="cart-item-image">
+            <div class="cart-item-details">
+              <div class="cart-item-title">${item.title}</div>
+              <div class="cart-item-price">$${(item.price / 100).toFixed(2)}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading cart:', error);
+    });
+}
+
+// Load order history
+function loadOrderHistory() {
+  const orderContainer = document.getElementById('order-history');
+  
+  if (currentUser.orders.length === 0) {
+    orderContainer.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">📦</div>
+        <p>No orders yet.<br>Your print orders will appear here!</p>
+      </div>
+    `;
+  } else {
+    orderContainer.innerHTML = currentUser.orders.map(order => `
+      <div style="padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 1rem; margin-bottom: 1rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
+          <strong>Order #${order.id}</strong>
+          <span style="color: #10b981;">$${order.total}</span>
+        </div>
+        <div style="color: #64748b;">
+          <div>Date: ${order.date}</div>
+          <div>Status: ${order.status}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+// Load account settings
+function loadAccountSettings() {
+  document.getElementById('user-email').value = currentUser.email;
+  document.getElementById('user-name').value = currentUser.name;
+  document.getElementById('current-plan').textContent = currentUser.tier.charAt(0).toUpperCase() + currentUser.tier.slice(1) + ' Tier';
+}
+
+// Upgrade modal functions
+function showUpgradeModal() {
+  document.getElementById('upgrade-modal').style.display = 'flex';
+}
+
+function closeUpgradeModal() {
+  document.getElementById('upgrade-modal').style.display = 'none';
+  selectedPlan = null;
+}
+
+function selectPlan(plan) {
+  selectedPlan = plan;
+  
+  // Update visual selection
+  document.querySelectorAll('#upgrade-modal > div > div:nth-child(2) > div').forEach(div => {
+    div.style.borderColor = '#e2e8f0';
+  });
+  
+  event.target.closest('div').style.borderColor = '#8B5CF6';
+}
+
+function processPlanUpgrade() {
+  if (!selectedPlan) {
+    alert('Please select a plan first.');
+    return;
+  }
+  
+  // This would integrate with Shopify's subscription API
+  alert(`Upgrading to ${selectedPlan} plan... This would redirect to Shopify checkout.`);
+  
+  // For demo purposes, update the user tier
+  currentUser.tier = selectedPlan;
+  updateDashboardStats();
+  closeUpgradeModal();
+  
+  // Save to localStorage for demo
+  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+}
+
+// Utility functions
+function filterArtwork(filter) {
+  // Implementation for artwork filtering
+  console.log('Filtering artwork by:', filter);
+}
+
+function viewArtwork(artworkId) {
+  // Implementation for viewing specific artwork
+  console.log('Viewing artwork:', artworkId);
+}
+
+function updateAccountSettings() {
+  currentUser.name = document.getElementById('user-name').value;
+  // This would save to Shopify customer data
+  alert('Settings updated successfully!');
+  
+  // Save to localStorage for demo
+  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+}
+
+function manageBilling() {
+  // This would redirect to Shopify customer portal
+  alert('This would redirect to billing management...');
+}
+
+// Initialize dashboard when page loads
+document.addEventListener('DOMContentLoaded', initializeDashboard);
+
+// Export functions for global access
+window.showDashboardTab = showDashboardTab;
+window.showUpgradeModal = showUpgradeModal;
+window.closeUpgradeModal = closeUpgradeModal;
+window.selectPlan = selectPlan;
+window.processPlanUpgrade = processPlanUpgrade;
+</script>
