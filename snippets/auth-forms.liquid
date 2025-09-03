@@ -387,7 +387,10 @@
   <div id="logout-section" style="display: none; background: #fef2f2; color: #dc2626; padding: 2rem; border-radius: 1rem; margin-top: 2rem; text-align: center;">
     <h3>🚪 Already Signed In?</h3>
     <p>You are currently logged in. Click below to sign out and access the sign-in form.</p>
-    <button class="factory-button" style="background: #dc2626; border-color: #dc2626;" onclick="forceLogout()">Sign Out</button>
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+      <button class="factory-button" style="background: #dc2626; border-color: #dc2626;" onclick="forceLogout()">Sign Out</button>
+      <a href="/account" class="factory-button" style="background: #8B5CF6; border-color: #8B5CF6; text-decoration: none;">Manage Account</a>
+    </div>
   </div>
 
   <!-- Factory Access (Admin Testing) -->
@@ -447,13 +450,15 @@ async function handleSignIn(event) {
   const password = document.getElementById('signin-password').value;
   
   try {
-    // Create a form and submit it to Shopify's login endpoint
+    showSuccess('signin', 'Signing in...');
+    
+    // Use Shopify's customer login endpoint
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/account/login';
     form.style.display = 'none';
     
-    // Add form fields
+    // Add required form fields for Shopify
     const formFields = {
       'form_type': 'customer_login',
       'utf8': '✓',
@@ -472,14 +477,12 @@ async function handleSignIn(event) {
     
     document.body.appendChild(form);
     
-    showSuccess('signin', 'Signing in...');
-    
-    // Submit the form
+    // Submit the form to Shopify
     form.submit();
     
   } catch (error) {
     console.error('Sign in error:', error);
-    showError('signin', 'Network error. Please try again.');
+    showError('signin', 'Error signing in. Please try again.');
   }
 }
 
@@ -505,18 +508,20 @@ async function handleSignUp(event) {
   }
   
   try {
-    // Split name into first and last name
+    showSuccess('signup', 'Creating account...');
+    
+    // Split name into first and last name for Shopify
     const nameParts = name.trim().split(' ');
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Create a form and submit it to Shopify's registration endpoint
+    // Use Shopify's customer registration endpoint
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = '/account';
     form.style.display = 'none';
     
-    // Add form fields
+    // Add required form fields for Shopify
     const formFields = {
       'form_type': 'create_customer',
       'utf8': '✓',
@@ -524,7 +529,7 @@ async function handleSignUp(event) {
       'customer[last_name]': lastName,
       'customer[email]': email,
       'customer[password]': password,
-      'return_to': '/pages/auth?signup=success'
+      'return_to': '/pages/account'
     };
     
     Object.keys(formFields).forEach(key => {
@@ -537,19 +542,12 @@ async function handleSignUp(event) {
     
     document.body.appendChild(form);
     
-    showSuccess('signup', 'Creating account...');
-    
-    // Initialize user with Free tier
-    if (window.PiccatsoSubscription) {
-      window.PiccatsoSubscription.initializeUser(email, 'free');
-    }
-    
-    // Submit the form
+    // Submit the form to Shopify
     form.submit();
     
   } catch (error) {
     console.error('Sign up error:', error);
-    showError('signup', 'Network error. Please try again.');
+    showError('signup', 'Error creating account. Please try again.');
   }
 }
 
@@ -734,6 +732,15 @@ function forceLogout() {
   // Hide logout section and show success
   document.getElementById('logout-section').style.display = 'none';
   showSuccess('signin', 'You have been logged out successfully. You can now sign in with a different account.');
+  
+  // If user was logged into Shopify, redirect to Shopify logout
+  const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+  if (user.loginMethod === 'shopify') {
+    // Redirect to Shopify's logout page
+    setTimeout(() => {
+      window.location.href = '/account/logout';
+    }, 1500);
+  }
 }
 
 // Initialize on page load
@@ -820,18 +827,69 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
   
-  // Check if user is already logged in (only if not logging out)
-  const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
-  if (user.email && user.isLoggedIn) {
-    // Show logout section instead of auto-redirecting
-    document.getElementById('logout-section').style.display = 'block';
-    
-    // Update the logout section with user info
-    const logoutSection = document.getElementById('logout-section');
-    const userName = user.name || 'User';
-    const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
-    
-    logoutSection.querySelector('p').textContent = `You are logged in as ${userName} (${tierName} tier). Click below to sign out.`;
-  }
+  // Check if user is already logged in via Shopify or local storage
+  checkShopifyCustomerStatus();
 });
+
+// Function to check if user is logged into Shopify
+async function checkShopifyCustomerStatus() {
+  try {
+    // Check if we have a Shopify customer object (this means user is logged in)
+    if (typeof window.Shopify !== 'undefined' && window.Shopify.customer) {
+      const customer = window.Shopify.customer;
+      
+      if (customer.id) {
+        // User is logged into Shopify - sync with local system
+        const userData = {
+          id: 'shopify_' + customer.id,
+          email: customer.email,
+          name: customer.first_name + ' ' + customer.last_name,
+          tier: 'free', // Default tier
+          isLoggedIn: true,
+          loginTime: new Date().toISOString(),
+          loginMethod: 'shopify',
+          shopifyCustomerId: customer.id
+        };
+        
+        // Store in localStorage
+        localStorage.setItem('piccatso_user', JSON.stringify(userData));
+        
+        // Initialize subscription manager
+        if (window.PiccatsoSubscription) {
+          window.PiccatsoSubscription.initializeUser(customer.email, 'free');
+        }
+        
+        // Update header navigation
+        window.dispatchEvent(new Event('piccatso-auth-change'));
+        if (window.refreshAuthButton) {
+          window.refreshAuthButton();
+        }
+        
+        // Show logout section
+        document.getElementById('logout-section').style.display = 'block';
+        const logoutSection = document.getElementById('logout-section');
+        logoutSection.querySelector('p').textContent = `You are logged in as ${userData.name} (${userData.tier} tier). Click below to sign out.`;
+        
+        return;
+      }
+    }
+    
+    // Check local storage for existing user
+    const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+    if (user.email && user.isLoggedIn) {
+      // Show logout section
+      document.getElementById('logout-section').style.display = 'block';
+      
+      // Update the logout section with user info
+      const logoutSection = document.getElementById('logout-section');
+      const userName = user.name || 'User';
+      const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
+      
+      logoutSection.querySelector('p').textContent = `You are logged in as ${userName} (${tierName} tier). Click below to sign out.`;
+    }
+    
+  } catch (error) {
+    console.error('Error checking Shopify customer status:', error);
+  }
+}
 </script>
