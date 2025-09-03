@@ -768,6 +768,58 @@ document.addEventListener('DOMContentLoaded', function() {
     return;
   }
   
+  // Check for Google OAuth success
+  const googleSuccess = urlParams.get('google_success') === 'true';
+  if (googleSuccess) {
+    const session = urlParams.get('session');
+    const email = urlParams.get('email');
+    const name = urlParams.get('name');
+    
+    if (session && email) {
+      try {
+        // Parse session data
+        const sessionData = JSON.parse(atob(session));
+        
+        // Store user data
+        localStorage.setItem('piccatso_user', JSON.stringify({
+          id: sessionData.googleId || 'google_' + Date.now(),
+          email: email,
+          name: name || sessionData.name || 'Google User',
+          tier: sessionData.tier || 'free',
+          isLoggedIn: true,
+          loginTime: sessionData.loginTime || new Date().toISOString(),
+          picture: sessionData.picture || '',
+          loginMethod: 'google'
+        }));
+        
+        // Initialize user in subscription manager
+        if (window.PiccatsoSubscription) {
+          window.PiccatsoSubscription.initializeUser(email, sessionData.tier || 'free');
+        }
+        
+        // Update header navigation
+        window.dispatchEvent(new Event('piccatso-auth-change'));
+        if (window.refreshAuthButton) {
+          window.refreshAuthButton();
+        }
+        
+        // Show success message
+        showSuccess('signin', `Welcome ${name}! You have been signed in with Google. Redirecting to your account...`);
+        
+        // Clean URL and redirect
+        setTimeout(() => {
+          window.history.replaceState({}, document.title, window.location.pathname);
+          window.location.href = '/pages/account';
+        }, 2000);
+        
+        return;
+      } catch (error) {
+        console.error('Error processing Google OAuth session:', error);
+        showError('signin', 'There was an error processing your Google sign-in. Please try again.');
+      }
+    }
+  }
+  
   // Check if user is already logged in (only if not logging out)
   const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
   if (user.email && user.isLoggedIn) {
