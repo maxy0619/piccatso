@@ -302,6 +302,8 @@
           const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
           const authContainer = document.getElementById('auth-nav-container');
           
+          console.log('Updating auth button. User data:', user); // Debug log
+          
           if (authContainer) {
             if (user.email && user.isLoggedIn) {
               // User is logged in - show account dropdown
@@ -368,6 +370,9 @@
         
         // Update when user logs in/out
         window.addEventListener('piccatso-auth-change', updateAuthButton);
+        
+        // Manual refresh function for debugging
+        window.refreshAuthButton = updateAuthButton;
       </script>
       <div id="auth-nav-container">
         <a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>

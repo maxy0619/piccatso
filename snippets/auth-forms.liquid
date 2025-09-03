@@ -669,6 +669,7 @@ function factoryLogin() {
     name: 'Factory Account',
     tier: 'factory',
     isFactory: true,
+    isLoggedIn: true,
     loginTime: new Date().toISOString(),
     permissions: {
       fullAccess: true,
@@ -687,6 +688,11 @@ function factoryLogin() {
   
   // Update header navigation
   window.dispatchEvent(new Event('piccatso-auth-change'));
+  
+  // Force immediate header refresh
+  if (window.refreshAuthButton) {
+    window.refreshAuthButton();
+  }
   
   // Show success and redirect
   showSuccess('signin', 'Factory access granted! Redirecting to account...');
