@@ -644,6 +644,9 @@ function handleSocialLoginSuccess(user) {
     window.PiccatsoSubscription.initializeUser(user.email, 'free');
   }
   
+  // Update header navigation
+  window.dispatchEvent(new Event('piccatso-auth-change'));
+  
   // Redirect to account page
   showSuccess('signin', `Welcome ${user.name}! Redirecting to your account...`);
   setTimeout(() => {
@@ -681,6 +684,9 @@ function factoryLogin() {
     window.PiccatsoSubscription.initializeUser(factoryCredentials.email, 'factory');
     window.PiccatsoSubscription.setFactoryMode(true);
   }
+  
+  // Update header navigation
+  window.dispatchEvent(new Event('piccatso-auth-change'));
   
   // Show success and redirect
   showSuccess('signin', 'Factory access granted! Redirecting to account...');

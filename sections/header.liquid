@@ -98,6 +98,56 @@
       padding: 0.6rem 1.2rem !important;
     }
   }
+
+  /* Hide default Shopify menu - we use custom navigation */
+  .header__inline-menu {
+    display: none !important;
+  }
+
+  /* Account dropdown styles */
+  .account-dropdown {
+    position: relative;
+    display: inline-block;
+  }
+
+  .account-dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 200px;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+    border-radius: 0.8rem;
+    z-index: 1000;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+  }
+
+  .account-dropdown:hover .account-dropdown-content {
+    display: block;
+  }
+
+  .account-dropdown-content a {
+    color: #1e293b !important;
+    padding: 1rem 1.5rem;
+    text-decoration: none;
+    display: block;
+    font-size: 1.4rem;
+    transition: background-color 0.2s;
+  }
+
+  .account-dropdown-content a:hover {
+    background-color: #f8fafc;
+  }
+
+  .account-dropdown-content .logout-btn {
+    color: #dc2626 !important;
+    border-top: 1px solid #e2e8f0;
+  }
+
+  .account-dropdown-content .logout-btn:hover {
+    background-color: #fef2f2;
+  }
 </style>
 
 {%- style -%}
@@ -156,6 +206,8 @@
     endif
   -%}
   <header class="header header--{{ section.settings.logo_position }} header--mobile-{{ section.settings.mobile_logo_position }} page-width{% if section.settings.menu_type_desktop == 'drawer' %} drawer-menu{% endif %}{% if section.settings.menu != blank %} header--has-menu{% endif %}{% if has_app_block %} header--has-app{% endif %}{% if social_links %} header--has-social{% endif %}{% if shop.customer_accounts_enabled %} header--has-account{% endif %}{% if localization_forms %} header--has-localizations{% endif %}">
+    {%- comment -%}
+    Header drawer hidden - using simplified custom navigation
     {%- liquid
       if section.settings.menu != blank
         render 'header-drawer'
@@ -165,6 +217,7 @@
         render 'header-search', input_id: 'Search-In-Modal-1'
       endif
     -%}
+    {%- endcomment -%}
 
     {%- if section.settings.logo_position != 'middle-center' -%}
       {%- if request.page_type == 'index' -%}
@@ -196,6 +249,8 @@
       {%- endif -%}
     {%- endif -%}
 
+    {%- comment -%}
+    Default Shopify menu hidden - using custom navigation instead
     {%- liquid
       if section.settings.menu != blank
         if section.settings.menu_type_desktop == 'dropdown'
@@ -205,6 +260,7 @@
         endif
       endif
     %}
+    {%- endcomment -%}
 
     {%- if section.settings.logo_position == 'middle-center' -%}
       {%- if request.page_type == 'index' -%}
@@ -248,14 +304,60 @@
           
           if (authContainer) {
             if (user.email && user.isLoggedIn) {
-              // User is logged in - show account button
+              // User is logged in - show account dropdown
               const userName = user.name ? user.name.split(' ')[0] : 'Account';
-              authContainer.innerHTML = `<a href="/pages/account" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">👤 ${userName}</a>`;
+              const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
+              const tierColor = user.tier === 'factory' ? '#ef4444' : user.tier === 'pro' ? '#10b981' : user.tier === 'premium' ? '#8B5CF6' : '#64748b';
+              
+              authContainer.innerHTML = `
+                <div class="account-dropdown" style="margin-right:1rem;">
+                  <button class="button button--secondary" style="font-size:1.2rem; padding:0.6rem 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    👤 ${userName}
+                    <span style="font-size: 0.8rem; background: ${tierColor}; color: white; padding: 0.2rem 0.5rem; border-radius: 0.3rem;">${tierName}</span>
+                    <svg style="width: 12px; height: 12px;" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                  </button>
+                  <div class="account-dropdown-content">
+                    <a href="/pages/account">📊 Dashboard</a>
+                    <a href="/pages/account#artwork">🎨 My Artwork</a>
+                    <a href="/pages/account#cart">🛒 Shopping Cart</a>
+                    <a href="/pages/account#settings">⚙️ Settings</a>
+                    ${user.tier === 'free' ? '<a href="/pages/subscription">⭐ Upgrade Plan</a>' : ''}
+                    <a href="#" onclick="logoutUser()" class="logout-btn">🚪 Sign Out</a>
+                  </div>
+                </div>
+              `;
             } else {
               // User not logged in - show sign in button
               authContainer.innerHTML = '<a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>';
             }
           }
+        }
+        
+        function logoutUser() {
+          // Clear user data
+          localStorage.removeItem('piccatso_user');
+          localStorage.removeItem('piccatso_user_data');
+          
+          // Clear Factory mode if active
+          const banner = document.getElementById('factory-mode-banner');
+          if (banner) {
+            banner.remove();
+            document.body.style.paddingTop = '';
+          }
+          
+          // Update UI
+          updateAuthButton();
+          
+          // Dispatch event for other components
+          window.dispatchEvent(new Event('piccatso-auth-change'));
+          
+          // Show confirmation
+          alert('You have been signed out successfully.');
+          
+          // Redirect to home page
+          window.location.href = '/';
         }
         
         // Update on page load
@@ -297,6 +399,8 @@
       </div>
       {% render 'header-search', input_id: 'Search-In-Modal' %}
 
+      {%- comment -%}
+      Default Shopify account icon hidden - using custom account dropdown instead
       {%- if shop.customer_accounts_enabled -%}
         <a
           href="{%- if customer -%}{{ routes.account_url }}{%- else -%}{{ routes.account_login_url }}{%- endif -%}"
@@ -325,6 +429,7 @@
           </span>
         </a>
       {%- endif -%}
+      {%- endcomment -%}
 
       {%- for block in section.blocks -%}
         {%- case block.type -%}
