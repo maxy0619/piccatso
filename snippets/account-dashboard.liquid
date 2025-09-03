@@ -263,6 +263,92 @@
       opacity: 0.5;
     }
     
+    /* User Profile Header */
+    .user-profile-header {
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      padding: 3rem;
+      border-radius: 2rem;
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      box-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    }
+    
+    .profile-avatar {
+      flex-shrink: 0;
+    }
+    
+    .avatar-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: white;
+    }
+    
+    .profile-info {
+      flex-grow: 1;
+    }
+    
+    .profile-name {
+      font-size: 2.4rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem 0;
+      color: white;
+    }
+    
+    .profile-email {
+      font-size: 1.4rem;
+      margin: 0 0 1rem 0;
+      opacity: 0.9;
+      color: white;
+    }
+    
+    .profile-tier {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .tier-badge {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    
+    .login-status {
+      font-size: 1.2rem;
+      opacity: 0.8;
+      color: #10b981;
+      font-weight: 600;
+    }
+    
+    .profile-actions {
+      flex-shrink: 0;
+    }
+    
+    .profile-actions .action-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+    }
+    
+    .profile-actions .action-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
     @media (max-width: 768px) {
       .account-dashboard {
         padding: 1rem;
@@ -274,6 +360,16 @@
       
       .dashboard-nav {
         flex-wrap: wrap;
+      }
+      
+      .user-profile-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 2rem;
+      }
+      
+      .profile-tier {
+        justify-content: center;
       }
     }
   </style>
@@ -289,6 +385,28 @@
 
   <!-- Overview Tab -->
   <div class="dashboard-content active" id="overview-content">
+    <!-- User Profile Header -->
+    <div class="user-profile-header" id="user-profile-header">
+      <div class="profile-avatar">
+        <div class="avatar-circle" id="avatar-circle">
+          <span id="avatar-initials">U</span>
+        </div>
+      </div>
+      <div class="profile-info">
+        <h2 class="profile-name" id="profile-name">Welcome back!</h2>
+        <p class="profile-email" id="profile-email">Loading...</p>
+        <div class="profile-tier" id="profile-tier-display">
+          <span class="tier-badge" id="tier-badge">Free Tier</span>
+          <span class="login-status" id="login-status">● Online</span>
+        </div>
+      </div>
+      <div class="profile-actions">
+        <button class="action-button secondary" onclick="showDashboardTab('settings')">
+          ⚙️ Edit Profile
+        </button>
+      </div>
+    </div>
+    
     <div class="dashboard-grid">
       
       <!-- Subscription Status Card -->
@@ -596,6 +714,7 @@ let selectedPlan = null;
 // Initialize dashboard
 function initializeDashboard() {
   loadUserData();
+  updateUserProfile();
   updateDashboardStats();
   loadRecentActivity();
 }
@@ -631,25 +750,90 @@ function showDashboardTab(tabName) {
   }
 }
 
-// Load user data from Shopify customer
+// Load user data from localStorage and Shopify customer
 function loadUserData() {
-  // This would integrate with Shopify customer data
-  if (typeof customer !== 'undefined' && customer) {
+  // Load from localStorage (primary source for our app)
+  const userData = localStorage.getItem('piccatso_user');
+  const userDataExtended = localStorage.getItem('piccatso_user_data');
+  
+  if (userData) {
+    const user = JSON.parse(userData);
+    currentUser.email = user.email || '';
+    currentUser.name = user.name || '';
+    currentUser.tier = user.tier || 'free';
+    currentUser.isLoggedIn = user.isLoggedIn || false;
+    currentUser.id = user.id || '';
+    currentUser.provider = user.provider || '';
+    currentUser.isFactory = user.isFactory || false;
+  }
+  
+  if (userDataExtended) {
+    const extendedData = JSON.parse(userDataExtended);
+    currentUser = { ...currentUser, ...extendedData };
+  }
+  
+  // Fallback to Shopify customer data if available
+  if (typeof customer !== 'undefined' && customer && !currentUser.email) {
     currentUser.email = customer.email || '';
-    currentUser.name = customer.first_name + ' ' + customer.last_name || '';
+    currentUser.name = (customer.first_name + ' ' + customer.last_name).trim() || '';
     
-    // Load subscription tier from customer tags or metafields
+    // Load subscription tier from customer tags
     if (customer.tags) {
       if (customer.tags.includes('premium')) currentUser.tier = 'premium';
       if (customer.tags.includes('pro')) currentUser.tier = 'pro';
+      if (customer.tags.includes('factory')) currentUser.tier = 'factory';
     }
   }
   
-  // Load usage data from localStorage for demo
-  const savedData = localStorage.getItem('piccatso_user_data');
-  if (savedData) {
-    const data = JSON.parse(savedData);
-    currentUser = { ...currentUser, ...data };
+  // Set defaults if no data
+  if (!currentUser.email) {
+    currentUser.email = 'guest@piccatso.com';
+    currentUser.name = 'Guest User';
+    currentUser.isLoggedIn = false;
+  }
+}
+
+// Update user profile header
+function updateUserProfile() {
+  // Update avatar initials
+  const initials = currentUser.name ? 
+    currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'U';
+  document.getElementById('avatar-initials').textContent = initials;
+  
+  // Update profile info
+  document.getElementById('profile-name').textContent = currentUser.name || 'Welcome back!';
+  document.getElementById('profile-email').textContent = currentUser.email || 'Loading...';
+  
+  // Update tier badge with proper styling
+  const tierBadge = document.getElementById('tier-badge');
+  const tierName = currentUser.tier ? currentUser.tier.charAt(0).toUpperCase() + currentUser.tier.slice(1) : 'Free';
+  
+  tierBadge.textContent = `${tierName} Tier`;
+  
+  // Color the profile header based on tier
+  const profileHeader = document.getElementById('user-profile-header');
+  switch(currentUser.tier) {
+    case 'factory':
+      profileHeader.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      break;
+    case 'pro':
+      profileHeader.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+      break;
+    case 'premium':
+      profileHeader.style.background = 'linear-gradient(135deg, #8B5CF6, #A855F7)';
+      break;
+    default:
+      profileHeader.style.background = 'linear-gradient(135deg, #64748b, #475569)';
+  }
+  
+  // Update login status
+  const loginStatus = document.getElementById('login-status');
+  if (currentUser.isLoggedIn) {
+    loginStatus.textContent = '● Online';
+    loginStatus.style.color = '#10b981';
+  } else {
+    loginStatus.textContent = '● Offline';
+    loginStatus.style.color = '#ef4444';
   }
 }
 
@@ -848,20 +1032,48 @@ function selectPlan(plan) {
 
 function processPlanUpgrade() {
   if (!selectedPlan) {
-    alert('Please select a plan first.');
+    showNotification('Please select a plan first.', 'error');
     return;
   }
   
-  // This would integrate with Shopify's subscription API
-  alert(`Upgrading to ${selectedPlan} plan... This would redirect to Shopify checkout.`);
+  // Show loading state
+  const upgradeBtn = document.querySelector('[onclick="processPlanUpgrade()"]');
+  const originalText = upgradeBtn.textContent;
+  upgradeBtn.textContent = 'Processing...';
+  upgradeBtn.disabled = true;
   
-  // For demo purposes, update the user tier
-  currentUser.tier = selectedPlan;
-  updateDashboardStats();
-  closeUpgradeModal();
-  
-  // Save to localStorage for demo
-  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+  // Simulate upgrade process
+  setTimeout(() => {
+    // Update user tier
+    currentUser.tier = selectedPlan;
+    
+    // Update localStorage
+    const userData = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+    userData.tier = selectedPlan;
+    localStorage.setItem('piccatso_user', JSON.stringify(userData));
+    localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+    
+    // Update UI
+    updateUserProfile();
+    updateDashboardStats();
+    
+    // Update header navigation
+    window.dispatchEvent(new Event('piccatso-auth-change'));
+    
+    // Reset button and close modal
+    upgradeBtn.textContent = originalText;
+    upgradeBtn.disabled = false;
+    closeUpgradeModal();
+    
+    // Show success notification
+    const tierName = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+    showNotification(`Successfully upgraded to ${tierName} plan!`, 'success');
+    
+    // Reset generations used for new tier
+    currentUser.generationsUsed = 0;
+    updateDashboardStats();
+    
+  }, 2000);
 }
 
 // Password management functions
@@ -952,18 +1164,96 @@ function updateAccountSettings() {
   const newName = document.getElementById('user-name').value;
   
   if (!newName.trim()) {
-    alert('Please enter a valid name.');
+    showNotification('Please enter a valid name.', 'error');
     return;
   }
   
-  // Update current user data
-  currentUser.name = newName.trim();
+  // Show loading state
+  const updateBtn = document.querySelector('[onclick="updateAccountSettings()"]');
+  const originalText = updateBtn.textContent;
+  updateBtn.textContent = 'Updating...';
+  updateBtn.disabled = true;
   
-  // Save to localStorage for demo
-  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+  setTimeout(() => {
+    // Update current user data
+    currentUser.name = newName.trim();
+    
+    // Update localStorage
+    const userData = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+    userData.name = newName.trim();
+    localStorage.setItem('piccatso_user', JSON.stringify(userData));
+    localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+    
+    // Update profile display
+    updateUserProfile();
+    
+    // Update header navigation
+    window.dispatchEvent(new Event('piccatso-auth-change'));
+    
+    // Reset button
+    updateBtn.textContent = originalText;
+    updateBtn.disabled = false;
+    
+    showNotification('Account settings updated successfully!', 'success');
+  }, 1000);
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  // Remove existing notifications
+  const existingNotifications = document.querySelectorAll('.notification');
+  existingNotifications.forEach(n => n.remove());
   
-  // For Shopify integration, this would update customer information
-  alert('Account settings updated successfully!');
+  // Create notification
+  const notification = document.createElement('div');
+  notification.className = `notification notification-${type}`;
+  notification.innerHTML = `
+    <div class="notification-content">
+      <span class="notification-icon">${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
+      <span class="notification-message">${message}</span>
+      <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+    </div>
+  `;
+  
+  // Add styles
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.8rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10000;
+    animation: slideInRight 0.3s ease-out;
+    max-width: 400px;
+  `;
+  
+  notification.querySelector('.notification-content').style.cssText = `
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  `;
+  
+  notification.querySelector('.notification-close').style.cssText = `
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    margin-left: auto;
+  `;
+  
+  document.body.appendChild(notification);
+  
+  // Auto-remove after 5 seconds
+  setTimeout(() => {
+    if (notification.parentNode) {
+      notification.remove();
+    }
+  }, 5000);
 }
 
 function manageBilling() {
@@ -975,29 +1265,59 @@ function manageBilling() {
 function filterArtwork(filter) {
   // Implementation for artwork filtering
   console.log('Filtering artwork by:', filter);
+  showNotification(`Filtering artwork by: ${filter}`, 'info');
 }
 
 function viewArtwork(artworkId) {
   // Implementation for viewing specific artwork
   console.log('Viewing artwork:', artworkId);
-}
-
-function updateAccountSettings() {
-  currentUser.name = document.getElementById('user-name').value;
-  // This would save to Shopify customer data
-  alert('Settings updated successfully!');
-  
-  // Save to localStorage for demo
-  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
-}
-
-function manageBilling() {
-  // This would redirect to Shopify customer portal
-  alert('This would redirect to billing management...');
+  showNotification('Opening artwork viewer...', 'info');
 }
 
 // Initialize dashboard when page loads
-document.addEventListener('DOMContentLoaded', initializeDashboard);
+document.addEventListener('DOMContentLoaded', function() {
+  initializeDashboard();
+  
+  // Check URL hash for direct tab navigation
+  const hash = window.location.hash.substring(1);
+  if (hash && ['overview', 'artwork', 'cart', 'orders', 'settings'].includes(hash)) {
+    // Update active tab
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.classList.remove('active');
+    });
+    document.querySelector(`[onclick="showDashboardTab('${hash}')"]`)?.classList.add('active');
+    
+    // Show content
+    document.querySelectorAll('.dashboard-content').forEach(content => {
+      content.classList.remove('active');
+    });
+    document.getElementById(hash + '-content')?.classList.add('active');
+    
+    // Load tab-specific data
+    switch(hash) {
+      case 'artwork':
+        loadArtworkCollection();
+        break;
+      case 'cart':
+        loadCartItems();
+        break;
+      case 'orders':
+        loadOrderHistory();
+        break;
+      case 'settings':
+        loadAccountSettings();
+        break;
+    }
+  }
+});
+
+// Handle hash changes for direct linking
+window.addEventListener('hashchange', function() {
+  const hash = window.location.hash.substring(1);
+  if (hash && ['overview', 'artwork', 'cart', 'orders', 'settings'].includes(hash)) {
+    showDashboardTab(hash);
+  }
+});
 
 // Export functions for global access
 window.showDashboardTab = showDashboardTab;
@@ -1005,4 +1325,8 @@ window.showUpgradeModal = showUpgradeModal;
 window.closeUpgradeModal = closeUpgradeModal;
 window.selectPlan = selectPlan;
 window.processPlanUpgrade = processPlanUpgrade;
+window.updateAccountSettings = updateAccountSettings;
+window.showPasswordForm = showPasswordForm;
+window.cancelPasswordChange = cancelPasswordChange;
+window.updatePassword = updatePassword;
 </script>
