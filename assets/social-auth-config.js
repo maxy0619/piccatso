@@ -9,7 +9,7 @@ window.SOCIAL_AUTH_CONFIG = {
   // Where your server handles the OAuth callback and exchanges code -> tokens.
   // This should be an HTTPS endpoint you control (could be a serverless function).
   // Example: https://api.yourdomain.com/auth/callback
-  backendCallbackBaseUrl: "",
+  backendCallbackBaseUrl: "https://piccatso-oauth-3k4hsgyqd-maxy0619-gmailcoms-projects.vercel.app",
 
   // Page to return users to on success (after your backend finishes the exchange and sets a session)
   postLoginRedirect: "/pages/account",
@@ -20,7 +20,7 @@ window.SOCIAL_AUTH_CONFIG = {
       enabled: true,
       clientId: "285074342032-ca72b6jsl8jc35ojirvtl36mh65jatng.apps.googleusercontent.com",
       // This must be whitelisted in the Google Cloud Console
-      redirectUri: "",
+      redirectUri: "https://piccatso-oauth-3k4hsgyqd-maxy0619-gmailcoms-projects.vercel.app/api/auth/google/callback",
       // Space-separated scopes
       scope: "openid email profile",
     },
