@@ -1,0 +1,44 @@
+{
+  "sections": {
+    "subscription_hero": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Choose Your Piccatso Plan",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Unlock the full potential of AI art creation with our subscription plans designed for every creator.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 20
+      }
+    },
+    "subscription_plans": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "{% render 'subscription-plans' %}"
+      }
+    }
+  },
+  "order": [
+    "subscription_hero",
+    "subscription_plans"
+  ]
+}

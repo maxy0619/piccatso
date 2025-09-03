@@ -1,0 +1,459 @@
+{% comment %}
+  Subscription Plans Display
+  Shows all available subscription tiers with features and pricing
+{% endcomment %}
+
+<div class="subscription-plans" id="subscription-plans">
+  <style>
+    .subscription-plans {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+    
+    .plan-card {
+      background: white;
+      border-radius: 2rem;
+      padding: 3rem 2rem;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+      border: 3px solid transparent;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .plan-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 16px 60px rgba(0, 0, 0, 0.15);
+    }
+    
+    .plan-card.popular {
+      border-color: #8B5CF6;
+      transform: scale(1.05);
+    }
+    
+    .plan-card.popular::before {
+      content: "Most Popular";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      text-align: center;
+      padding: 0.5rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+    
+    .plan-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding-top: 1rem;
+    }
+    
+    .plan-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    
+    .plan-name {
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .plan-price {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: #1e293b;
+      margin-bottom: 0.5rem;
+    }
+    
+    .plan-price-period {
+      font-size: 1.4rem;
+      color: #64748b;
+    }
+    
+    .plan-description {
+      color: #64748b;
+      font-size: 1.4rem;
+      margin-bottom: 2rem;
+    }
+    
+    .plan-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 3rem 0;
+    }
+    
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      font-size: 1.4rem;
+    }
+    
+    .feature-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      flex-shrink: 0;
+    }
+    
+    .feature-icon.included {
+      background: #10b981;
+      color: white;
+    }
+    
+    .feature-icon.excluded {
+      background: #ef4444;
+      color: white;
+    }
+    
+    .plan-button {
+      width: 100%;
+      padding: 1.5rem;
+      border: none;
+      border-radius: 1rem;
+      font-size: 1.6rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .plan-button.free {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+    
+    .plan-button.premium {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: white;
+    }
+    
+    .plan-button.pro {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+    }
+    
+    .plan-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .current-plan {
+      background: #d4edda !important;
+      color: #155724 !important;
+      cursor: default;
+    }
+    
+    .current-plan:hover {
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .annual-toggle {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    
+    .toggle-switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 1rem;
+      background: #f1f5f9;
+      padding: 0.5rem;
+      border-radius: 2rem;
+    }
+    
+    .toggle-option {
+      padding: 1rem 2rem;
+      border-radius: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 600;
+    }
+    
+    .toggle-option.active {
+      background: #8B5CF6;
+      color: white;
+    }
+    
+    .savings-badge {
+      background: #10b981;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 1rem;
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-left: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .subscription-plans {
+        padding: 1rem;
+      }
+      
+      .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .plan-card.popular {
+        transform: none;
+      }
+    }
+  </style>
+
+  <!-- Annual/Monthly Toggle -->
+  <div class="annual-toggle">
+    <div class="toggle-switch">
+      <div class="toggle-option active" onclick="toggleBilling('monthly')">Monthly</div>
+      <div class="toggle-option" onclick="toggleBilling('annual')">
+        Annual <span class="savings-badge">Save 10%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plans Grid -->
+  <div class="plans-grid">
+    
+    <!-- Free Plan -->
+    <div class="plan-card" data-plan="free">
+      <div class="plan-header">
+        <div class="plan-icon">🆓</div>
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0</div>
+        <div class="plan-price-period">forever</div>
+        <div class="plan-description">Perfect for trying out AI art</div>
+      </div>
+      
+      <ul class="plan-features">
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>10 AI generations per month</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>All art styles available</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Basic print-on-demand ordering</span>
+        </li>
+        <li>
+          <div class="feature-icon excluded">✗</div>
+          <span>No art history saved</span>
+        </li>
+        <li>
+          <div class="feature-icon excluded">✗</div>
+          <span>Watermarked downloads only</span>
+        </li>
+        <li>
+          <div class="feature-icon excluded">✗</div>
+          <span>No customer support</span>
+        </li>
+      </ul>
+      
+      <button class="plan-button free" onclick="selectPlan('free')">
+        Get Started Free
+      </button>
+    </div>
+    
+    <!-- Premium Plan -->
+    <div class="plan-card popular" data-plan="premium">
+      <div class="plan-header">
+        <div class="plan-icon">⭐</div>
+        <div class="plan-name">Premium</div>
+        <div class="plan-price monthly-price">$9.99</div>
+        <div class="plan-price annual-price" style="display: none;">$8.99</div>
+        <div class="plan-price-period">/month</div>
+        <div class="plan-description">Most popular for personal use</div>
+      </div>
+      
+      <ul class="plan-features">
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>100 AI generations per month</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Art history saved (50 creations)</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>High resolution (1024x1024px)</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Priority processing (2x faster)</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Favorites collection</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Email support</span>
+        </li>
+        <li>
+          <div class="feature-icon excluded">✗</div>
+          <span>Still watermarked downloads</span>
+        </li>
+      </ul>
+      
+      <button class="plan-button premium" onclick="selectPlan('premium')">
+        Upgrade to Premium
+      </button>
+    </div>
+    
+    <!-- Pro Plan -->
+    <div class="plan-card" data-plan="pro">
+      <div class="plan-header">
+        <div class="plan-icon">🎨</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price monthly-price">$39.99</div>
+        <div class="plan-price annual-price" style="display: none;">$35.99</div>
+        <div class="plan-price-period">/month</div>
+        <div class="plan-description">For professional artists & businesses</div>
+      </div>
+      
+      <ul class="plan-features">
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>1000 AI generations per month</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Unlimited art history</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Ultra HD (2048x2048px)</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Clean downloads (no watermark)</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Commercial usage rights</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>10% discount on all prints</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Custom style training</span>
+        </li>
+        <li>
+          <div class="feature-icon included">✓</div>
+          <span>Priority support (24hr response)</span>
+        </li>
+      </ul>
+      
+      <button class="plan-button pro" onclick="selectPlan('pro')">
+        Upgrade to Pro
+      </button>
+    </div>
+    
+  </div>
+  
+  <!-- Additional Info -->
+  <div style="text-align: center; margin-top: 4rem; padding: 2rem; background: #f8fafc; border-radius: 1rem;">
+    <h3 style="margin-bottom: 1rem;">✨ All plans include:</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 2rem;">
+      <div>🎨 All AI art styles and filters</div>
+      <div>🖨️ Print-on-demand integration</div>
+      <div>🔒 Secure payment processing</div>
+      <div>📱 Mobile-friendly interface</div>
+    </div>
+  </div>
+</div>
+
+<script>
+let billingCycle = 'monthly';
+
+function toggleBilling(cycle) {
+  billingCycle = cycle;
+  
+  // Update toggle appearance
+  document.querySelectorAll('.toggle-option').forEach(option => {
+    option.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Update pricing display
+  if (cycle === 'annual') {
+    document.querySelectorAll('.monthly-price').forEach(price => {
+      price.style.display = 'none';
+    });
+    document.querySelectorAll('.annual-price').forEach(price => {
+      price.style.display = 'block';
+    });
+  } else {
+    document.querySelectorAll('.monthly-price').forEach(price => {
+      price.style.display = 'block';
+    });
+    document.querySelectorAll('.annual-price').forEach(price => {
+      price.style.display = 'none';
+    });
+  }
+}
+
+function selectPlan(planName) {
+  if (planName === 'free') {
+    // For free plan, just redirect to create page
+    window.location.href = '/pages/create';
+    return;
+  }
+  
+  // For paid plans, this would integrate with Shopify's subscription system
+  // For now, show a message
+  alert(`Redirecting to checkout for ${planName} plan (${billingCycle} billing)...`);
+  
+  // In a real implementation, this would:
+  // 1. Create a Shopify subscription product
+  // 2. Add it to cart
+  // 3. Redirect to checkout
+  // 4. After successful payment, update customer tags
+  
+  // Example Shopify integration:
+  // window.location.href = `/cart/add?id=${getSubscriptionVariantId(planName, billingCycle)}&return_to=/checkout`;
+}
+
+// Initialize current plan display
+document.addEventListener('DOMContentLoaded', function() {
+  // Check current user tier and update button
+  if (window.PiccatsoSubscription) {
+    const currentTier = window.PiccatsoSubscription.currentUser.tier;
+    const currentButton = document.querySelector(`[data-plan="${currentTier}"] .plan-button`);
+    
+    if (currentButton) {
+      currentButton.textContent = 'Current Plan';
+      currentButton.classList.add('current-plan');
+    }
+  }
+});
+</script>
