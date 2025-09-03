@@ -1,0 +1,135 @@
+{% comment %}
+  Debug Navigation - Test page to verify all navigation links work
+{% endcomment %}
+
+<div style="max-width: 800px; margin: 0 auto; padding: 2rem; font-family: Arial, sans-serif;">
+  <h1 style="color: #1e293b; margin-bottom: 2rem;">🔍 Navigation Debug Page</h1>
+  
+  <div style="background: #f8fafc; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
+    <h2 style="color: #475569; margin-bottom: 1rem;">Current Page Information</h2>
+    <ul style="list-style: none; padding: 0;">
+      <li style="margin-bottom: 0.5rem;"><strong>Current URL:</strong> <span id="current-url"></span></li>
+      <li style="margin-bottom: 0.5rem;"><strong>Page Type:</strong> {{ request.page_type }}</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Template:</strong> {{ template.name }}</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Page Handle:</strong> {% if page %}{{ page.handle }}{% else %}N/A{% endif %}</li>
+    </ul>
+  </div>
+  
+  <div style="background: #fef3c7; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
+    <h2 style="color: #92400e; margin-bottom: 1rem;">⚠️ Navigation Test Links</h2>
+    <p style="margin-bottom: 1rem;">Click these links to test navigation:</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+      <a href="/pages/gallery" 
+         style="display: block; padding: 1rem; background: #8B5CF6; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        🎨 Gallery Page<br><small>/pages/gallery</small>
+      </a>
+      
+      <a href="/pages/auth" 
+         style="display: block; padding: 1rem; background: #10b981; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        🔐 Auth Page<br><small>/pages/auth</small>
+      </a>
+      
+      <a href="/pages/account" 
+         style="display: block; padding: 1rem; background: #f59e0b; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        👤 Account Page<br><small>/pages/account</small>
+      </a>
+      
+      <a href="/pages/printful-preview" 
+         style="display: block; padding: 1rem; background: #ef4444; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        🧪 Printful Preview<br><small>/pages/printful-preview</small>
+      </a>
+      
+      <a href="/pages/subscription" 
+         style="display: block; padding: 1rem; background: #6366f1; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        💳 Subscription<br><small>/pages/subscription</small>
+      </a>
+      
+      <a href="/pages/test-navigation" 
+         style="display: block; padding: 1rem; background: #06b6d4; color: white; text-decoration: none; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+        🔍 Test Navigation<br><small>/pages/test-navigation</small>
+      </a>
+    </div>
+  </div>
+  
+  <div style="background: #dcfce7; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
+    <h2 style="color: #166534; margin-bottom: 1rem;">✅ Available Templates</h2>
+    <p style="margin-bottom: 1rem;">These templates exist in the codebase:</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+      <div style="padding: 1rem; background: white; border-radius: 0.5rem; border: 1px solid #d1fae5;">
+        <strong>page.auth.json</strong><br>
+        <small>Authentication page with social login</small>
+      </div>
+      
+      <div style="padding: 1rem; background: white; border-radius: 0.5rem; border: 1px solid #d1fae5;">
+        <strong>page.gallery.json</strong><br>
+        <small>AI Art gallery page</small>
+      </div>
+      
+      <div style="padding: 1rem; background: white; border-radius: 0.5rem; border: 1px solid #d1fae5;">
+        <strong>page.account.json</strong><br>
+        <small>User account dashboard</small>
+      </div>
+      
+      <div style="padding: 1rem; background: white; border-radius: 0.5rem; border: 1px solid #d1fae5;">
+        <strong>page.subscription.json</strong><br>
+        <small>Subscription plans page</small>
+      </div>
+      
+      <div style="padding: 1rem; background: white; border-radius: 0.5rem; border: 1px solid #d1fae5;">
+        <strong>page.printful-preview.json</strong><br>
+        <small>Printful integration testing</small>
+      </div>
+    </div>
+  </div>
+  
+  <div style="background: #fecaca; padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
+    <h2 style="color: #991b1b; margin-bottom: 1rem;">🚨 Troubleshooting Guide</h2>
+    
+    <h3 style="color: #7f1d1d; margin-bottom: 1rem;">If links show 404 errors:</h3>
+    <ol style="margin-bottom: 2rem;">
+      <li style="margin-bottom: 0.5rem;">Go to <strong>Shopify Admin → Online Store → Pages</strong></li>
+      <li style="margin-bottom: 0.5rem;">Check if these pages exist with correct handles:</li>
+      <ul style="margin: 1rem 0; padding-left: 2rem;">
+        <li><strong>Gallery</strong> (handle: <code>gallery</code>, template: <code>page.gallery</code>)</li>
+        <li><strong>Sign In</strong> (handle: <code>auth</code>, template: <code>page.auth</code>)</li>
+        <li><strong>Account</strong> (handle: <code>account</code>, template: <code>page.account</code>)</li>
+      </ul>
+      <li style="margin-bottom: 0.5rem;">If pages don't exist, create them with the exact handles above</li>
+      <li style="margin-bottom: 0.5rem;">Make sure each page is set to "Visible" (not hidden)</li>
+      <li style="margin-bottom: 0.5rem;">Verify the template is selected correctly for each page</li>
+    </ol>
+    
+    <h3 style="color: #7f1d1d; margin-bottom: 1rem;">If templates aren't available:</h3>
+    <ol>
+      <li style="margin-bottom: 0.5rem;">Sync your GitHub repository to Shopify</li>
+      <li style="margin-bottom: 0.5rem;">Or manually upload the template files</li>
+      <li style="margin-bottom: 0.5rem;">Check that snippets (auth-forms.liquid, gallery-grid.liquid) are also uploaded</li>
+    </ol>
+  </div>
+  
+  <div style="background: #e0e7ff; padding: 2rem; border-radius: 1rem;">
+    <h2 style="color: #3730a3; margin-bottom: 1rem;">🔧 Quick Fix Commands</h2>
+    <p style="margin-bottom: 1rem;">If you have access to Shopify CLI, run these commands:</p>
+    
+    <div style="background: #1e293b; color: #f1f5f9; padding: 1rem; border-radius: 0.5rem; font-family: monospace; margin-bottom: 1rem;">
+      shopify theme push<br>
+      shopify theme dev
+    </div>
+    
+    <p><strong>Or manually sync via GitHub integration in Shopify Admin.</strong></p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('current-url').textContent = window.location.href;
+  
+  // Test localStorage
+  console.log('Piccatso User Data:', localStorage.getItem('piccatso_user'));
+  
+  // Test if scripts are loaded
+  console.log('PiccatsoSubscription available:', typeof window.PiccatsoSubscription !== 'undefined');
+});
+</script>

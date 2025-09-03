@@ -1,0 +1,13 @@
+{
+  "sections": {
+    "debug_navigation": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "{% render 'debug-navigation' %}"
+      }
+    }
+  },
+  "order": [
+    "debug_navigation"
+  ]
+}
