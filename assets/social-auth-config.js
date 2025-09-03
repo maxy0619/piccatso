@@ -3,25 +3,21 @@
 // We do NOT simulate accounts; these are real OAuth redirects to your provider(s).
 
 window.SOCIAL_AUTH_CONFIG = {
-  // Global toggle
-  enabled: true,
+  // Global toggle - DISABLED: Using Shopify native customer accounts only
+  enabled: false,
 
-  // Where your server handles the OAuth callback and exchanges code -> tokens.
-  // This should be an HTTPS endpoint you control (could be a serverless function).
-  // Example: https://api.yourdomain.com/auth/callback
-  backendCallbackBaseUrl: "https://piccatso-oauth-3k4hsgyqd-maxy0619-gmailcoms-projects.vercel.app",
+  // All social authentication is disabled - using Shopify's built-in system
+  backendCallbackBaseUrl: "",
 
-  // Page to return users to on success (after your backend finishes the exchange and sets a session)
+  // Page to return users to on success
   postLoginRedirect: "/pages/account",
 
-  // Providers
+  // Providers - All disabled
   providers: {
     google: {
-      enabled: true,
-      clientId: "285074342032-ca72b6jsl8jc35ojirvtl36mh65jatng.apps.googleusercontent.com",
-      // This must be whitelisted in the Google Cloud Console
-      redirectUri: "https://piccatso-oauth-3k4hsgyqd-maxy0619-gmailcoms-projects.vercel.app/api/auth/google/callback",
-      // Space-separated scopes
+      enabled: false,
+      clientId: "",
+      redirectUri: "",
       scope: "openid email profile",
     },
     apple: {
@@ -34,9 +30,8 @@ window.SOCIAL_AUTH_CONFIG = {
       enabled: false,
       clientId: "",
       redirectUri: "",
-      // Use v2 endpoint scopes
       scope: "openid email profile offline_access",
-      tenant: "common" // or your tenant ID
+      tenant: "common"
     }
   }
 };
