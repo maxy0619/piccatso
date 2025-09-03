@@ -17,8 +17,8 @@ window.SOCIAL_AUTH_CONFIG = {
   // Providers
   providers: {
     google: {
-      enabled: false,
-      clientId: "",
+      enabled: true,
+      clientId: "285074342032-ca72b6jsl8jc35ojirvtl36mh65jatng.apps.googleusercontent.com",
       // This must be whitelisted in the Google Cloud Console
       redirectUri: "",
       // Space-separated scopes
