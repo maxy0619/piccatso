@@ -1,0 +1,44 @@
+{
+  "sections": {
+    "auth_hero": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "Welcome to Piccatso",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Sign in to access your AI art creations and manage your subscription.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 20
+      }
+    },
+    "auth_forms": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "{% render 'auth-forms' %}"
+      }
+    }
+  },
+  "order": [
+    "auth_hero",
+    "auth_forms"
+  ]
+}

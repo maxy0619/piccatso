@@ -237,8 +237,28 @@
     {%- endif -%}
 
     <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
-      <a href="/pages/printful-preview" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🧪 Test POD</a>
-      <a href="/pages/account" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">👤 Account</a>
+      <!-- Navigation Links -->
+      <a href="/pages/gallery" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🎨 Gallery</a>
+      
+      <!-- Dynamic Account/Auth Button -->
+      <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+          const authContainer = document.getElementById('auth-nav-container');
+          
+          if (user.email) {
+            // User is logged in - show account button
+            authContainer.innerHTML = '<a href="/pages/account" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">👤 Account</a>';
+          } else {
+            // User not logged in - show sign in button
+            authContainer.innerHTML = '<a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>';
+          }
+        });
+      </script>
+      <div id="auth-nav-container">
+        <a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>
+      </div>
+      
       <a href="/#create" class="button button--primary header__create-btn" style="margin-right:1rem;">Create yours</a>
       <div class="desktop-localization-wrapper">
         {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}

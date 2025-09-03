@@ -36,6 +36,23 @@ class PiccatsoSubscriptionManager {
         processingSpeed: 3,
         printDiscount: 10,
         features: ['basic_pod', 'community_gallery', 'art_history', 'favorites', 'advanced_editing', 'clean_downloads', 'commercial_rights', 'custom_training', 'bulk_operations', 'advanced_export']
+      },
+      factory: {
+        name: 'Factory',
+        price: 0,
+        generationsLimit: -1, // unlimited
+        resolution: '4096x4096', // ultra high resolution
+        watermark: false,
+        artHistory: -1, // unlimited
+        processingSpeed: 10, // maximum speed
+        printDiscount: 50, // maximum discount
+        isFactory: true,
+        features: [
+          'basic_pod', 'community_gallery', 'art_history', 'favorites', 'advanced_editing', 
+          'clean_downloads', 'commercial_rights', 'custom_training', 'bulk_operations', 
+          'advanced_export', 'admin_panel', 'testing_mode', 'all_features', 'unlimited_access',
+          'api_access', 'debug_mode', 'analytics_access', 'user_management'
+        ]
       }
     };
     
@@ -440,6 +457,173 @@ class PiccatsoSubscriptionManager {
     }
 
     this.saveUserData();
+  }
+
+  /**
+   * Initialize Factory account with full access
+   * @param {string} email - Factory account email
+   * @param {string} tier - User tier (should be 'factory')
+   */
+  initializeUser(email, tier = 'free') {
+    this.currentUser = {
+      ...this.currentUser,
+      email: email,
+      tier: tier,
+      isLoggedIn: true,
+      id: tier === 'factory' ? 'factory_001' : this.currentUser.id || `user_${Date.now()}`
+    };
+
+    if (tier === 'factory') {
+      this.currentUser.isFactory = true;
+      this.currentUser.factoryMode = true;
+      this.currentUser.permissions = {
+        fullAccess: true,
+        adminPanel: true,
+        testingMode: true,
+        unlimitedGenerations: true,
+        allFeatures: true,
+        debugMode: true,
+        userManagement: true
+      };
+    }
+
+    this.saveUserData();
+    this.updateUI();
+  }
+
+  /**
+   * Set Factory mode on/off
+   * @param {boolean} enabled - Whether to enable factory mode
+   */
+  setFactoryMode(enabled = true) {
+    if (this.currentUser.tier !== 'factory') {
+      console.warn('Factory mode can only be enabled for Factory tier users');
+      return false;
+    }
+
+    this.currentUser.factoryMode = enabled;
+    this.saveUserData();
+    
+    // Update UI to show factory mode
+    if (enabled) {
+      this.showFactoryModeIndicator();
+    } else {
+      this.hideFactoryModeIndicator();
+    }
+
+    return true;
+  }
+
+  /**
+   * Show factory mode indicator in UI
+   */
+  showFactoryModeIndicator() {
+    // Add factory mode banner
+    const existingBanner = document.getElementById('factory-mode-banner');
+    if (existingBanner) return;
+
+    const banner = document.createElement('div');
+    banner.id = 'factory-mode-banner';
+    banner.innerHTML = `
+      <div style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        text-align: center;
+        padding: 0.5rem;
+        font-weight: 600;
+        z-index: 10000;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      ">
+        🏭 FACTORY MODE ACTIVE - Full System Access | User: Factory | All Features Unlocked
+      </div>
+    `;
+    
+    document.body.appendChild(banner);
+    
+    // Adjust body padding to account for banner
+    document.body.style.paddingTop = '40px';
+  }
+
+  /**
+   * Hide factory mode indicator
+   */
+  hideFactoryModeIndicator() {
+    const banner = document.getElementById('factory-mode-banner');
+    if (banner) {
+      banner.remove();
+      document.body.style.paddingTop = '';
+    }
+  }
+
+  /**
+   * Check if user has factory access
+   * @returns {boolean}
+   */
+  isFactoryUser() {
+    return this.currentUser.tier === 'factory' && this.currentUser.isFactory === true;
+  }
+
+  /**
+   * Get factory account credentials (for testing purposes)
+   * @returns {object|null}
+   */
+  getFactoryCredentials() {
+    if (!this.isFactoryUser()) return null;
+    
+    return {
+      username: 'Factory',
+      email: 'factory@piccatso.internal',
+      tier: 'factory',
+      features: this.tiers.factory.features,
+      permissions: this.currentUser.permissions || {}
+    };
+  }
+
+  /**
+   * Update UI based on current user tier and factory mode
+   */
+  updateUI() {
+    // Update tier display
+    const tierElements = document.querySelectorAll('[data-user-tier]');
+    tierElements.forEach(el => {
+      el.textContent = this.tiers[this.currentUser.tier].name;
+      if (this.currentUser.tier === 'factory') {
+        el.style.color = '#ef4444';
+        el.style.fontWeight = 'bold';
+      }
+    });
+
+    // Show factory mode if active
+    if (this.currentUser.factoryMode) {
+      this.showFactoryModeIndicator();
+    }
+
+    // Update navigation for factory users
+    if (this.isFactoryUser()) {
+      this.updateFactoryNavigation();
+    }
+  }
+
+  /**
+   * Update navigation for factory users
+   */
+  updateFactoryNavigation() {
+    // Add admin panel link to navigation if it doesn't exist
+    const authContainer = document.getElementById('auth-nav-container');
+    if (authContainer && !document.getElementById('admin-panel-link')) {
+      const adminLink = document.createElement('a');
+      adminLink.id = 'admin-panel-link';
+      adminLink.href = '/pages/printful-preview'; // Use existing testing page as admin panel
+      adminLink.className = 'button button--secondary';
+      adminLink.style.cssText = 'margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem; background: linear-gradient(135deg, #ef4444, #dc2626) !important; color: white !important;';
+      adminLink.textContent = '🏭 Admin Panel';
+      
+      authContainer.parentNode.insertBefore(adminLink, authContainer);
+    }
   }
 }
 

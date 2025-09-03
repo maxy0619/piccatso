@@ -1,0 +1,474 @@
+{% comment %}
+  Authentication Forms - Sign In / Sign Up
+  Handles user login, registration, and factory account access
+{% endcomment %}
+
+<div class="auth-container" id="auth-container">
+  <style>
+    .auth-container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .auth-tabs {
+      display: flex;
+      border-radius: 1rem;
+      background: #f1f5f9;
+      padding: 0.5rem;
+      margin-bottom: 3rem;
+    }
+    
+    .auth-tab {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      background: transparent;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .auth-tab.active {
+      background: white;
+      color: #8B5CF6;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .auth-form {
+      display: none;
+      background: white;
+      padding: 3rem;
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    }
+    
+    .auth-form.active {
+      display: block;
+    }
+    
+    .form-group {
+      margin-bottom: 2rem;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #1e293b;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 1.2rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.8rem;
+      font-size: 1.6rem;
+      transition: all 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #8B5CF6;
+      box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    
+    .form-button {
+      width: 100%;
+      padding: 1.5rem;
+      background: linear-gradient(135deg, #8B5CF6, #A855F7);
+      color: white;
+      border: none;
+      border-radius: 0.8rem;
+      font-size: 1.6rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .form-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    }
+    
+    .form-button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      margin: 2rem 0;
+      color: #64748b;
+    }
+    
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e2e8f0;
+    }
+    
+    .auth-divider span {
+      padding: 0 1rem;
+    }
+    
+    .factory-access {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      margin-top: 2rem;
+      text-align: center;
+    }
+    
+    .factory-access h3 {
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+    
+    .factory-button {
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    
+    .factory-button:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .error-message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .success-message {
+      background: #f0fdf4;
+      color: #16a34a;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    
+    .forgot-password {
+      text-align: center;
+      margin-top: 1rem;
+    }
+    
+    .forgot-password a {
+      color: #8B5CF6;
+      text-decoration: none;
+    }
+    
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+    
+    @media (max-width: 768px) {
+      .auth-container {
+        padding: 1rem;
+      }
+      
+      .auth-form {
+        padding: 2rem;
+      }
+    }
+  </style>
+
+  <!-- Auth Tabs -->
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchTab('signin')">Sign In</button>
+    <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
+  </div>
+
+  <!-- Sign In Form -->
+  <div class="auth-form active" id="signin-form">
+    <div class="error-message" id="signin-error"></div>
+    <div class="success-message" id="signin-success"></div>
+    
+    <form onsubmit="handleSignIn(event)">
+      <div class="form-group">
+        <label class="form-label" for="signin-email">Email Address</label>
+        <input type="email" id="signin-email" class="form-input" placeholder="your@email.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="signin-password">Password</label>
+        <input type="password" id="signin-password" class="form-input" placeholder="Enter your password" required>
+      </div>
+      
+      <button type="submit" class="form-button">Sign In</button>
+    </form>
+    
+    <div class="forgot-password">
+      <a href="#" onclick="showForgotPassword()">Forgot your password?</a>
+    </div>
+  </div>
+
+  <!-- Sign Up Form -->
+  <div class="auth-form" id="signup-form">
+    <div class="error-message" id="signup-error"></div>
+    <div class="success-message" id="signup-success"></div>
+    
+    <form onsubmit="handleSignUp(event)">
+      <div class="form-group">
+        <label class="form-label" for="signup-name">Full Name</label>
+        <input type="text" id="signup-name" class="form-input" placeholder="John Doe" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="signup-email">Email Address</label>
+        <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="signup-password">Password</label>
+        <input type="password" id="signup-password" class="form-input" placeholder="Create a strong password" required minlength="8">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="signup-confirm">Confirm Password</label>
+        <input type="password" id="signup-confirm" class="form-input" placeholder="Confirm your password" required minlength="8">
+      </div>
+      
+      <button type="submit" class="form-button">Create Account</button>
+    </form>
+  </div>
+
+  <!-- Factory Access (Admin Testing) -->
+  <div class="factory-access">
+    <h3>🏭 Factory Access</h3>
+    <p>Secure testing environment with full system access</p>
+    <button class="factory-button" onclick="factoryLogin()">Access Factory Account</button>
+  </div>
+</div>
+
+<script>
+let currentTab = 'signin';
+
+function switchTab(tab) {
+  currentTab = tab;
+  
+  // Update tab buttons
+  document.querySelectorAll('.auth-tab').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+  
+  // Update forms
+  document.querySelectorAll('.auth-form').forEach(form => {
+    form.classList.remove('active');
+  });
+  document.getElementById(tab + '-form').classList.add('active');
+  
+  // Clear messages
+  clearMessages();
+}
+
+function clearMessages() {
+  document.querySelectorAll('.error-message, .success-message').forEach(msg => {
+    msg.style.display = 'none';
+    msg.textContent = '';
+  });
+}
+
+function showError(formType, message) {
+  const errorEl = document.getElementById(formType + '-error');
+  errorEl.textContent = message;
+  errorEl.style.display = 'block';
+}
+
+function showSuccess(formType, message) {
+  const successEl = document.getElementById(formType + '-success');
+  successEl.textContent = message;
+  successEl.style.display = 'block';
+}
+
+async function handleSignIn(event) {
+  event.preventDefault();
+  clearMessages();
+  
+  const email = document.getElementById('signin-email').value;
+  const password = document.getElementById('signin-password').value;
+  
+  try {
+    // Integrate with Shopify customer login
+    const response = await fetch('/account/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'form_type': 'customer_login',
+        'utf8': '✓',
+        'customer[email]': email,
+        'customer[password]': password
+      })
+    });
+    
+    if (response.ok) {
+      // Check if this is a redirect (successful login)
+      if (response.redirected) {
+        showSuccess('signin', 'Sign in successful! Redirecting...');
+        setTimeout(() => {
+          window.location.href = '/pages/account';
+        }, 1000);
+      } else {
+        // Parse response for errors
+        const text = await response.text();
+        if (text.includes('Invalid email or password')) {
+          showError('signin', 'Invalid email or password. Please try again.');
+        } else {
+          showError('signin', 'Sign in failed. Please try again.');
+        }
+      }
+    } else {
+      showError('signin', 'Sign in failed. Please check your credentials.');
+    }
+  } catch (error) {
+    console.error('Sign in error:', error);
+    showError('signin', 'Network error. Please try again.');
+  }
+}
+
+async function handleSignUp(event) {
+  event.preventDefault();
+  clearMessages();
+  
+  const name = document.getElementById('signup-name').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  const confirmPassword = document.getElementById('signup-confirm').value;
+  
+  // Validate passwords match
+  if (password !== confirmPassword) {
+    showError('signup', 'Passwords do not match.');
+    return;
+  }
+  
+  // Validate password strength
+  if (password.length < 8) {
+    showError('signup', 'Password must be at least 8 characters long.');
+    return;
+  }
+  
+  try {
+    // Split name into first and last name
+    const nameParts = name.trim().split(' ');
+    const firstName = nameParts[0] || '';
+    const lastName = nameParts.slice(1).join(' ') || '';
+    
+    // Integrate with Shopify customer registration
+    const response = await fetch('/account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'form_type': 'create_customer',
+        'utf8': '✓',
+        'customer[first_name]': firstName,
+        'customer[last_name]': lastName,
+        'customer[email]': email,
+        'customer[password]': password
+      })
+    });
+    
+    if (response.ok) {
+      showSuccess('signup', 'Account created successfully! You can now sign in.');
+      
+      // Initialize user with Free tier
+      if (window.PiccatsoSubscription) {
+        window.PiccatsoSubscription.initializeUser(email, 'free');
+      }
+      
+      // Switch to sign in tab
+      setTimeout(() => {
+        switchTab('signin');
+        document.getElementById('signin-email').value = email;
+      }, 2000);
+    } else {
+      const text = await response.text();
+      if (text.includes('has already been taken')) {
+        showError('signup', 'An account with this email already exists.');
+      } else {
+        showError('signup', 'Account creation failed. Please try again.');
+      }
+    }
+  } catch (error) {
+    console.error('Sign up error:', error);
+    showError('signup', 'Network error. Please try again.');
+  }
+}
+
+function factoryLogin() {
+  // Factory account login with predefined credentials
+  const factoryCredentials = {
+    username: 'Factory',
+    password: 'Msi08536',
+    email: 'factory@piccatso.internal'
+  };
+  
+  // Set factory session
+  localStorage.setItem('piccatso_user', JSON.stringify({
+    id: 'factory_001',
+    email: factoryCredentials.email,
+    name: 'Factory Account',
+    tier: 'factory',
+    isFactory: true,
+    loginTime: new Date().toISOString(),
+    permissions: {
+      fullAccess: true,
+      adminPanel: true,
+      testingMode: true,
+      unlimitedGenerations: true,
+      allFeatures: true
+    }
+  }));
+  
+  // Initialize Factory tier in subscription manager
+  if (window.PiccatsoSubscription) {
+    window.PiccatsoSubscription.initializeUser(factoryCredentials.email, 'factory');
+    window.PiccatsoSubscription.setFactoryMode(true);
+  }
+  
+  // Show success and redirect
+  showSuccess('signin', 'Factory access granted! Redirecting to account...');
+  
+  setTimeout(() => {
+    window.location.href = '/pages/account?factory=true';
+  }, 1500);
+}
+
+function showForgotPassword() {
+  alert('Password reset functionality would integrate with Shopify customer accounts. For now, contact support or use the Factory account for testing.');
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Check if user is already logged in
+  const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+  if (user.email) {
+    showSuccess('signin', 'You are already signed in. Redirecting...');
+    setTimeout(() => {
+      window.location.href = '/pages/account';
+    }, 1000);
+  }
+});
+</script>

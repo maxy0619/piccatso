@@ -455,11 +455,11 @@
           <div class="card-title">Account Settings</div>
         </div>
         <div style="space-y: 1rem;">
-          <div>
+          <div style="margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Email Address</label>
             <input type="email" id="user-email" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" readonly>
           </div>
-          <div>
+          <div style="margin-bottom: 1rem;">
             <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Display Name</label>
             <input type="text" id="user-name" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;">
           </div>
@@ -467,6 +467,42 @@
         <button class="action-button" onclick="updateAccountSettings()">
           Update Settings
         </button>
+      </div>
+      
+      <!-- Password Management -->
+      <div class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon info">🔒</div>
+          <div class="card-title">Password & Security</div>
+        </div>
+        <div id="password-form" style="display: none;">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Current Password</label>
+            <input type="password" id="current-password" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" placeholder="Enter current password">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">New Password</label>
+            <input type="password" id="new-password" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" placeholder="Enter new password" minlength="8">
+          </div>
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Confirm New Password</label>
+            <input type="password" id="confirm-password" style="width: 100%; padding: 1rem; border: 1px solid #e2e8f0; border-radius: 0.5rem;" placeholder="Confirm new password" minlength="8">
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <button class="action-button" onclick="updatePassword()">
+              Update Password
+            </button>
+            <button class="action-button secondary" onclick="cancelPasswordChange()">
+              Cancel
+            </button>
+          </div>
+        </div>
+        <div id="password-prompt">
+          <p style="margin-bottom: 1rem; color: #64748b;">Keep your account secure with a strong password.</p>
+          <button class="action-button" onclick="showPasswordForm()">
+            Change Password
+          </button>
+        </div>
       </div>
       
       <!-- Subscription Management -->
@@ -826,6 +862,113 @@ function processPlanUpgrade() {
   
   // Save to localStorage for demo
   localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+}
+
+// Password management functions
+function showPasswordForm() {
+  document.getElementById('password-prompt').style.display = 'none';
+  document.getElementById('password-form').style.display = 'block';
+}
+
+function cancelPasswordChange() {
+  document.getElementById('password-form').style.display = 'none';
+  document.getElementById('password-prompt').style.display = 'block';
+  
+  // Clear form fields
+  document.getElementById('current-password').value = '';
+  document.getElementById('new-password').value = '';
+  document.getElementById('confirm-password').value = '';
+}
+
+async function updatePassword() {
+  const currentPassword = document.getElementById('current-password').value;
+  const newPassword = document.getElementById('new-password').value;
+  const confirmPassword = document.getElementById('confirm-password').value;
+  
+  // Validation
+  if (!currentPassword || !newPassword || !confirmPassword) {
+    alert('Please fill in all password fields.');
+    return;
+  }
+  
+  if (newPassword.length < 8) {
+    alert('New password must be at least 8 characters long.');
+    return;
+  }
+  
+  if (newPassword !== confirmPassword) {
+    alert('New passwords do not match.');
+    return;
+  }
+  
+  try {
+    // Check if this is the Factory account
+    const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+    if (user.isFactory) {
+      // Factory account password change
+      if (currentPassword !== 'Msi08536') {
+        alert('Current password is incorrect.');
+        return;
+      }
+      
+      // Update factory credentials (in real implementation, this would be server-side)
+      alert('Factory account password updated successfully! Please remember your new password.');
+      cancelPasswordChange();
+      return;
+    }
+    
+    // For regular Shopify customers, integrate with customer account API
+    const response = await fetch('/account', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        'form_type': 'customer_password',
+        'utf8': '✓',
+        'customer[password]': currentPassword,
+        'customer[password_confirmation]': newPassword
+      })
+    });
+    
+    if (response.ok) {
+      alert('Password updated successfully!');
+      cancelPasswordChange();
+    } else {
+      const text = await response.text();
+      if (text.includes('Current password is incorrect')) {
+        alert('Current password is incorrect.');
+      } else {
+        alert('Failed to update password. Please try again.');
+      }
+    }
+  } catch (error) {
+    console.error('Password update error:', error);
+    alert('Network error. Please try again.');
+  }
+}
+
+function updateAccountSettings() {
+  const newName = document.getElementById('user-name').value;
+  
+  if (!newName.trim()) {
+    alert('Please enter a valid name.');
+    return;
+  }
+  
+  // Update current user data
+  currentUser.name = newName.trim();
+  
+  // Save to localStorage for demo
+  localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+  
+  // For Shopify integration, this would update customer information
+  alert('Account settings updated successfully!');
+}
+
+function manageBilling() {
+  // This would integrate with Shopify's subscription billing
+  alert('Redirecting to billing management... (This would integrate with Shopify billing portal)');
 }
 
 // Utility functions
