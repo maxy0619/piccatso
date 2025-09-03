@@ -338,28 +338,8 @@
         }
         
         function logoutUser() {
-          // Clear user data
-          localStorage.removeItem('piccatso_user');
-          localStorage.removeItem('piccatso_user_data');
-          
-          // Clear Factory mode if active
-          const banner = document.getElementById('factory-mode-banner');
-          if (banner) {
-            banner.remove();
-            document.body.style.paddingTop = '';
-          }
-          
-          // Update UI
-          updateAuthButton();
-          
-          // Dispatch event for other components
-          window.dispatchEvent(new Event('piccatso-auth-change'));
-          
-          // Show confirmation
-          alert('You have been signed out successfully.');
-          
-          // Redirect to home page
-          window.location.href = '/';
+          // Redirect to auth page with logout parameter
+          window.location.href = '/pages/auth?logout=true';
         }
         
         // Update on page load

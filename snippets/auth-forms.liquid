@@ -383,6 +383,13 @@
     </form>
   </div>
 
+  <!-- Logout Option (if logged in) -->
+  <div id="logout-section" style="display: none; background: #fef2f2; color: #dc2626; padding: 2rem; border-radius: 1rem; margin-top: 2rem; text-align: center;">
+    <h3>🚪 Already Signed In?</h3>
+    <p>You are currently logged in. Click below to sign out and access the sign-in form.</p>
+    <button class="factory-button" style="background: #dc2626; border-color: #dc2626;" onclick="forceLogout()">Sign Out</button>
+  </div>
+
   <!-- Factory Access (Admin Testing) -->
   <div class="factory-access">
     <h3>🏭 Factory Access</h3>
@@ -706,15 +713,73 @@ function showForgotPassword() {
   alert('Password reset functionality would integrate with Shopify customer accounts. For now, contact support or use the Factory account for testing.');
 }
 
+function forceLogout() {
+  // Clear all data immediately
+  localStorage.clear();
+  sessionStorage.clear();
+  
+  // Remove Factory banner if present
+  const banner = document.getElementById('factory-mode-banner');
+  if (banner) {
+    banner.remove();
+    document.body.style.paddingTop = '';
+  }
+  
+  // Update header
+  window.dispatchEvent(new Event('piccatso-auth-change'));
+  if (window.refreshAuthButton) {
+    window.refreshAuthButton();
+  }
+  
+  // Hide logout section and show success
+  document.getElementById('logout-section').style.display = 'none';
+  showSuccess('signin', 'You have been logged out successfully. You can now sign in with a different account.');
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  // Check if user is already logged in
+  // Check URL for logout parameter
+  const urlParams = new URLSearchParams(window.location.search);
+  const isLogout = urlParams.get('logout') === 'true';
+  
+  if (isLogout) {
+    // User wants to log out - clear data and show logout message
+    localStorage.removeItem('piccatso_user');
+    localStorage.removeItem('piccatso_user_data');
+    sessionStorage.clear();
+    
+    // Remove Factory banner if present
+    const banner = document.getElementById('factory-mode-banner');
+    if (banner) {
+      banner.remove();
+      document.body.style.paddingTop = '';
+    }
+    
+    // Update header
+    window.dispatchEvent(new Event('piccatso-auth-change'));
+    if (window.refreshAuthButton) {
+      window.refreshAuthButton();
+    }
+    
+    showSuccess('signin', 'You have been logged out successfully.');
+    
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+    return;
+  }
+  
+  // Check if user is already logged in (only if not logging out)
   const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
-  if (user.email) {
-    showSuccess('signin', 'You are already signed in. Redirecting...');
-    setTimeout(() => {
-      window.location.href = '/pages/account';
-    }, 1000);
+  if (user.email && user.isLoggedIn) {
+    // Show logout section instead of auto-redirecting
+    document.getElementById('logout-section').style.display = 'block';
+    
+    // Update the logout section with user info
+    const logoutSection = document.getElementById('logout-section');
+    const userName = user.name || 'User';
+    const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
+    
+    logoutSection.querySelector('p').textContent = `You are logged in as ${userName} (${tierName} tier). Click below to sign out.`;
   }
 });
 </script>
