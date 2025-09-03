@@ -1,6 +1,7 @@
 {% comment %}
   Authentication Forms - Sign In / Sign Up
-  Handles user login, registration, and factory account access
+  Handles user login, registration, social auth, and factory account access
+  Integrates with Shopify Customer Accounts
 {% endcomment %}
 
 <div class="auth-container" id="auth-container">
@@ -148,6 +149,71 @@
       border-color: rgba(255, 255, 255, 0.5);
     }
     
+    .social-auth {
+      margin: 2rem 0;
+    }
+    
+    .social-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    .social-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      padding: 1.2rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.8rem;
+      background: white;
+      color: #1e293b;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.4rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .social-button:hover {
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .social-button.google {
+      border-color: #ea4335;
+    }
+    
+    .social-button.google:hover {
+      background: #ea4335;
+      color: white;
+    }
+    
+    .social-button.apple {
+      border-color: #000;
+    }
+    
+    .social-button.apple:hover {
+      background: #000;
+      color: white;
+    }
+    
+    .social-button.microsoft {
+      border-color: #0078d4;
+    }
+    
+    .social-button.microsoft:hover {
+      background: #0078d4;
+      color: white;
+    }
+    
+    .social-icon {
+      width: 20px;
+      height: 20px;
+    }
+    
     .error-message {
       background: #fef2f2;
       color: #dc2626;
@@ -202,6 +268,39 @@
     <div class="error-message" id="signin-error"></div>
     <div class="success-message" id="signin-success"></div>
     
+    <!-- Social Authentication -->
+    <div class="social-auth">
+      <div class="social-buttons">
+        <button type="button" class="social-button google" onclick="signInWithGoogle()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Continue with Google
+        </button>
+        
+        <button type="button" class="social-button apple" onclick="signInWithApple()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Continue with Apple
+        </button>
+        
+        <button type="button" class="social-button microsoft" onclick="signInWithMicrosoft()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+          </svg>
+          Continue with Microsoft
+        </button>
+      </div>
+    </div>
+    
+    <div class="auth-divider">
+      <span>or sign in with email</span>
+    </div>
+    
     <form onsubmit="handleSignIn(event)">
       <div class="form-group">
         <label class="form-label" for="signin-email">Email Address</label>
@@ -225,6 +324,39 @@
   <div class="auth-form" id="signup-form">
     <div class="error-message" id="signup-error"></div>
     <div class="success-message" id="signup-success"></div>
+    
+    <!-- Social Authentication -->
+    <div class="social-auth">
+      <div class="social-buttons">
+        <button type="button" class="social-button google" onclick="signUpWithGoogle()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Sign up with Google
+        </button>
+        
+        <button type="button" class="social-button apple" onclick="signUpWithApple()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+          </svg>
+          Sign up with Apple
+        </button>
+        
+        <button type="button" class="social-button microsoft" onclick="signUpWithMicrosoft()">
+          <svg class="social-icon" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/>
+          </svg>
+          Sign up with Microsoft
+        </button>
+      </div>
+    </div>
+    
+    <div class="auth-divider">
+      <span>or sign up with email</span>
+    </div>
     
     <form onsubmit="handleSignUp(event)">
       <div class="form-group">
@@ -308,39 +440,36 @@ async function handleSignIn(event) {
   const password = document.getElementById('signin-password').value;
   
   try {
-    // Integrate with Shopify customer login
-    const response = await fetch('/account/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        'form_type': 'customer_login',
-        'utf8': '✓',
-        'customer[email]': email,
-        'customer[password]': password
-      })
+    // Create a form and submit it to Shopify's login endpoint
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/account/login';
+    form.style.display = 'none';
+    
+    // Add form fields
+    const formFields = {
+      'form_type': 'customer_login',
+      'utf8': '✓',
+      'customer[email]': email,
+      'customer[password]': password,
+      'return_to': '/pages/account'
+    };
+    
+    Object.keys(formFields).forEach(key => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = formFields[key];
+      form.appendChild(input);
     });
     
-    if (response.ok) {
-      // Check if this is a redirect (successful login)
-      if (response.redirected) {
-        showSuccess('signin', 'Sign in successful! Redirecting...');
-        setTimeout(() => {
-          window.location.href = '/pages/account';
-        }, 1000);
-      } else {
-        // Parse response for errors
-        const text = await response.text();
-        if (text.includes('Invalid email or password')) {
-          showError('signin', 'Invalid email or password. Please try again.');
-        } else {
-          showError('signin', 'Sign in failed. Please try again.');
-        }
-      }
-    } else {
-      showError('signin', 'Sign in failed. Please check your credentials.');
-    }
+    document.body.appendChild(form);
+    
+    showSuccess('signin', 'Signing in...');
+    
+    // Submit the form
+    form.submit();
+    
   } catch (error) {
     console.error('Sign in error:', error);
     showError('signin', 'Network error. Please try again.');
@@ -374,47 +503,152 @@ async function handleSignUp(event) {
     const firstName = nameParts[0] || '';
     const lastName = nameParts.slice(1).join(' ') || '';
     
-    // Integrate with Shopify customer registration
-    const response = await fetch('/account', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        'form_type': 'create_customer',
-        'utf8': '✓',
-        'customer[first_name]': firstName,
-        'customer[last_name]': lastName,
-        'customer[email]': email,
-        'customer[password]': password
-      })
+    // Create a form and submit it to Shopify's registration endpoint
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/account';
+    form.style.display = 'none';
+    
+    // Add form fields
+    const formFields = {
+      'form_type': 'create_customer',
+      'utf8': '✓',
+      'customer[first_name]': firstName,
+      'customer[last_name]': lastName,
+      'customer[email]': email,
+      'customer[password]': password,
+      'return_to': '/pages/auth?signup=success'
+    };
+    
+    Object.keys(formFields).forEach(key => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = formFields[key];
+      form.appendChild(input);
     });
     
-    if (response.ok) {
-      showSuccess('signup', 'Account created successfully! You can now sign in.');
-      
-      // Initialize user with Free tier
-      if (window.PiccatsoSubscription) {
-        window.PiccatsoSubscription.initializeUser(email, 'free');
-      }
-      
-      // Switch to sign in tab
-      setTimeout(() => {
-        switchTab('signin');
-        document.getElementById('signin-email').value = email;
-      }, 2000);
-    } else {
-      const text = await response.text();
-      if (text.includes('has already been taken')) {
-        showError('signup', 'An account with this email already exists.');
-      } else {
-        showError('signup', 'Account creation failed. Please try again.');
-      }
+    document.body.appendChild(form);
+    
+    showSuccess('signup', 'Creating account...');
+    
+    // Initialize user with Free tier
+    if (window.PiccatsoSubscription) {
+      window.PiccatsoSubscription.initializeUser(email, 'free');
     }
+    
+    // Submit the form
+    form.submit();
+    
   } catch (error) {
     console.error('Sign up error:', error);
     showError('signup', 'Network error. Please try again.');
   }
+}
+
+// Social Authentication Functions
+async function signInWithGoogle() {
+  try {
+    showSuccess('signin', 'Redirecting to Google Sign In...');
+    
+    // In a real implementation, this would integrate with Google OAuth
+    // For now, we'll simulate the process
+    alert('Google Sign In would be integrated here. This requires setting up Google OAuth in your Shopify app settings.');
+    
+    // Simulate successful Google login for demo
+    setTimeout(() => {
+      const mockUser = {
+        email: 'user@gmail.com',
+        name: 'Google User',
+        provider: 'google'
+      };
+      handleSocialLoginSuccess(mockUser);
+    }, 1000);
+    
+  } catch (error) {
+    showError('signin', 'Google Sign In failed. Please try again.');
+  }
+}
+
+async function signInWithApple() {
+  try {
+    showSuccess('signin', 'Redirecting to Apple Sign In...');
+    
+    // In a real implementation, this would integrate with Apple Sign In
+    alert('Apple Sign In would be integrated here. This requires setting up Apple Sign In in your Shopify app settings.');
+    
+    // Simulate successful Apple login for demo
+    setTimeout(() => {
+      const mockUser = {
+        email: 'user@icloud.com',
+        name: 'Apple User',
+        provider: 'apple'
+      };
+      handleSocialLoginSuccess(mockUser);
+    }, 1000);
+    
+  } catch (error) {
+    showError('signin', 'Apple Sign In failed. Please try again.');
+  }
+}
+
+async function signInWithMicrosoft() {
+  try {
+    showSuccess('signin', 'Redirecting to Microsoft Sign In...');
+    
+    // In a real implementation, this would integrate with Microsoft OAuth
+    alert('Microsoft Sign In would be integrated here. This requires setting up Microsoft OAuth in your Shopify app settings.');
+    
+    // Simulate successful Microsoft login for demo
+    setTimeout(() => {
+      const mockUser = {
+        email: 'user@outlook.com',
+        name: 'Microsoft User',
+        provider: 'microsoft'
+      };
+      handleSocialLoginSuccess(mockUser);
+    }, 1000);
+    
+  } catch (error) {
+    showError('signin', 'Microsoft Sign In failed. Please try again.');
+  }
+}
+
+// Sign Up versions
+async function signUpWithGoogle() {
+  await signInWithGoogle(); // Same process for sign up
+}
+
+async function signUpWithApple() {
+  await signInWithApple(); // Same process for sign up
+}
+
+async function signUpWithMicrosoft() {
+  await signInWithMicrosoft(); // Same process for sign up
+}
+
+function handleSocialLoginSuccess(user) {
+  // Store user data
+  localStorage.setItem('piccatso_user', JSON.stringify({
+    id: `${user.provider}_${Date.now()}`,
+    email: user.email,
+    name: user.name,
+    tier: 'free',
+    isLoggedIn: true,
+    provider: user.provider,
+    loginTime: new Date().toISOString()
+  }));
+  
+  // Initialize subscription
+  if (window.PiccatsoSubscription) {
+    window.PiccatsoSubscription.initializeUser(user.email, 'free');
+  }
+  
+  // Redirect to account page
+  showSuccess('signin', `Welcome ${user.name}! Redirecting to your account...`);
+  setTimeout(() => {
+    window.location.href = '/pages/account';
+  }, 1500);
 }
 
 function factoryLogin() {

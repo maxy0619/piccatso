@@ -242,18 +242,30 @@
       
       <!-- Dynamic Account/Auth Button -->
       <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        function updateAuthButton() {
           const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
           const authContainer = document.getElementById('auth-nav-container');
           
-          if (user.email) {
-            // User is logged in - show account button
-            authContainer.innerHTML = '<a href="/pages/account" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">👤 Account</a>';
-          } else {
-            // User not logged in - show sign in button
-            authContainer.innerHTML = '<a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>';
+          if (authContainer) {
+            if (user.email && user.isLoggedIn) {
+              // User is logged in - show account button
+              const userName = user.name ? user.name.split(' ')[0] : 'Account';
+              authContainer.innerHTML = `<a href="/pages/account" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">👤 ${userName}</a>`;
+            } else {
+              // User not logged in - show sign in button
+              authContainer.innerHTML = '<a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>';
+            }
           }
-        });
+        }
+        
+        // Update on page load
+        document.addEventListener('DOMContentLoaded', updateAuthButton);
+        
+        // Update when storage changes (for cross-tab sync)
+        window.addEventListener('storage', updateAuthButton);
+        
+        // Update when user logs in/out
+        window.addEventListener('piccatso-auth-change', updateAuthButton);
       </script>
       <div id="auth-nav-container">
         <a href="/pages/auth" class="button button--secondary" style="margin-right:1rem; font-size:1.2rem; padding:0.6rem 1rem;">🔐 Sign In</a>
