@@ -61,21 +61,52 @@ class PiccatsoSubscriptionManager {
 
   async loadCustomerData() {
     try {
-      // Load subscription tier from customer metafields
-      const tierResponse = await this.getCustomerMetafield('subscription_tier');
-      this.currentTier = tierResponse?.value || 'free';
-      
-      // Load usage data
-      const usageResponse = await this.getCustomerMetafield('usage_data');
-      if (usageResponse?.value) {
-        this.usageData = JSON.parse(usageResponse.value);
+      // First, check if we have Shopify customer data
+      if (this.customer && this.customer.id) {
+        console.log('Loading customer data for:', this.customer.email);
+        
+        // Load subscription tier from customer tags (fallback to metafields)
+        if (this.customer.tags) {
+          if (this.customer.tags.includes('pro')) {
+            this.currentTier = 'pro';
+          } else if (this.customer.tags.includes('premium')) {
+            this.currentTier = 'premium';
+          } else if (this.customer.tags.includes('factory')) {
+            this.currentTier = 'factory';
+          } else {
+            this.currentTier = 'free';
+          }
+        }
+        
+        // Load usage data from localStorage (simulated for now)
+        const storedUsage = localStorage.getItem(`piccatso_usage_${this.customer.id}`);
+        if (storedUsage) {
+          this.usageData = JSON.parse(storedUsage);
+        }
+        
+        // Store customer data in localStorage for dashboard compatibility
+        const userData = {
+          id: this.customer.id,
+          email: this.customer.email,
+          name: `${this.customer.first_name} ${this.customer.last_name}`.trim(),
+          tier: this.currentTier,
+          isLoggedIn: true,
+          provider: 'shopify',
+          isFactory: this.currentTier === 'factory'
+        };
+        localStorage.setItem('piccatso_user', JSON.stringify(userData));
+        
+        // Check if we need to reset monthly usage
+        this.checkMonthlyReset();
+        
+      } else {
+        console.log('No Shopify customer data available, using defaults');
+        this.currentTier = 'free';
       }
-      
-      // Check if we need to reset monthly usage
-      this.checkMonthlyReset();
       
     } catch (error) {
       console.error('Error loading customer data:', error);
+      this.currentTier = 'free';
     }
   }
 
@@ -138,13 +169,43 @@ class PiccatsoSubscriptionManager {
   }
 
   async upgradeTier(newTier) {
-    if (this.tierLimits[newTier]) {
-      this.currentTier = newTier;
-      await this.setCustomerMetafield('subscription_tier', 'default', newTier);
-      this.updateUI();
-      return true;
+    if (!this.tierLimits[newTier]) {
+      return false;
     }
-    return false;
+    
+    try {
+      console.log(`Upgrading customer to ${newTier} tier`);
+      
+      // Update local data
+      this.currentTier = newTier;
+      this.usageData.monthlyGenerations = 0; // Reset usage on upgrade
+      
+      // Store updated data
+      if (this.customer && this.customer.id) {
+        localStorage.setItem(`piccatso_usage_${this.customer.id}`, JSON.stringify(this.usageData));
+        
+        // Update localStorage for dashboard compatibility
+        const userData = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+        userData.tier = newTier;
+        localStorage.setItem('piccatso_user', JSON.stringify(userData));
+      }
+      
+      this.updateUI();
+      
+      // Show success message
+      this.showNotification(`Successfully upgraded to ${newTier.charAt(0).toUpperCase() + newTier.slice(1)} Tier!`, 'success');
+      
+      // Refresh the page to update all components
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      
+      return true;
+    } catch (error) {
+      console.error('Error upgrading tier:', error);
+      this.showNotification('Failed to upgrade plan. Please try again.', 'error');
+      return false;
+    }
   }
 
   canGenerateArt() {
@@ -340,6 +401,35 @@ class PiccatsoSubscriptionManager {
       console.error('Error saving art to Shopify:', error);
       return false;
     }
+  }
+
+  showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+      color: white;
+      padding: 1rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 10000;
+      font-weight: 600;
+      max-width: 300px;
+    `;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 3000);
   }
 }
 

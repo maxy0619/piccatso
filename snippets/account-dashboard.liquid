@@ -1195,7 +1195,22 @@ function showDashboardTab(tabName) {
 
 // Load user data from localStorage and Shopify customer
 function loadUserData() {
-  // Load from localStorage (primary source for our app)
+  // First, try to get data from subscription manager if available
+  if (window.subscriptionManager && window.subscriptionManager.customer) {
+    const customer = window.subscriptionManager.customer;
+    currentUser.email = customer.email || '';
+    currentUser.name = `${customer.first_name} ${customer.last_name}`.trim() || '';
+    currentUser.tier = window.subscriptionManager.currentTier || 'free';
+    currentUser.isLoggedIn = true;
+    currentUser.id = customer.id || '';
+    currentUser.provider = 'shopify';
+    currentUser.isFactory = currentUser.tier === 'factory';
+    
+    console.log('Loaded user data from subscription manager:', currentUser);
+    return;
+  }
+  
+  // Load from localStorage (fallback)
   const userData = localStorage.getItem('piccatso_user');
   const userDataExtended = localStorage.getItem('piccatso_user_data');
   
@@ -1226,6 +1241,10 @@ function loadUserData() {
       if (customer.tags.includes('pro')) currentUser.tier = 'pro';
       if (customer.tags.includes('factory')) currentUser.tier = 'factory';
     }
+    
+    currentUser.isLoggedIn = true;
+    currentUser.id = customer.id || '';
+    currentUser.provider = 'shopify';
   }
   
   // Set defaults if no data
@@ -1234,6 +1253,8 @@ function loadUserData() {
     currentUser.name = 'Guest User';
     currentUser.isLoggedIn = false;
   }
+  
+  console.log('Loaded user data:', currentUser);
 }
 
 // Update user profile header
@@ -1485,38 +1506,67 @@ function processPlanUpgrade() {
   upgradeBtn.textContent = 'Processing...';
   upgradeBtn.disabled = true;
   
-  // Simulate upgrade process
-  setTimeout(() => {
-    // Update user tier
-    currentUser.tier = selectedPlan;
-    
-    // Update localStorage
-    const userData = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
-    userData.tier = selectedPlan;
-    localStorage.setItem('piccatso_user', JSON.stringify(userData));
-    localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
-    
-    // Update UI
-    updateUserProfile();
-    updateDashboardStats();
-    
-    // Update header navigation
-    window.dispatchEvent(new Event('piccatso-auth-change'));
-    
-    // Reset button and close modal
-    upgradeBtn.textContent = originalText;
-    upgradeBtn.disabled = false;
-    closeUpgradeModal();
-    
-    // Show success notification
-    const tierName = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
-    showNotification(`Successfully upgraded to ${tierName} plan!`, 'success');
-    
-    // Reset generations used for new tier
-    currentUser.generationsUsed = 0;
-    updateDashboardStats();
-    
-  }, 2000);
+  // Use subscription manager to upgrade
+  if (window.subscriptionManager) {
+    window.subscriptionManager.upgradeTier(selectedPlan).then(success => {
+      if (success) {
+        // Update local user data
+        currentUser.tier = selectedPlan;
+        
+        // Update UI
+        updateUserProfile();
+        updateDashboardStats();
+        
+        // Update header navigation
+        window.dispatchEvent(new Event('piccatso-auth-change'));
+        
+        // Reset button and close modal
+        upgradeBtn.textContent = originalText;
+        upgradeBtn.disabled = false;
+        closeUpgradeModal();
+        
+        // Reset generations used for new tier
+        currentUser.generationsUsed = 0;
+        updateDashboardStats();
+      } else {
+        // Reset button on failure
+        upgradeBtn.textContent = originalText;
+        upgradeBtn.disabled = false;
+      }
+    });
+  } else {
+    // Fallback to local upgrade
+    setTimeout(() => {
+      // Update user tier
+      currentUser.tier = selectedPlan;
+      
+      // Update localStorage
+      const userData = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+      userData.tier = selectedPlan;
+      localStorage.setItem('piccatso_user', JSON.stringify(userData));
+      localStorage.setItem('piccatso_user_data', JSON.stringify(currentUser));
+      
+      // Update UI
+      updateUserProfile();
+      updateDashboardStats();
+      
+      // Update header navigation
+      window.dispatchEvent(new Event('piccatso-auth-change'));
+      
+      // Reset button and close modal
+      upgradeBtn.textContent = originalText;
+      upgradeBtn.disabled = false;
+      closeUpgradeModal();
+      
+      // Show success notification
+      const tierName = selectedPlan.charAt(0).toUpperCase() + selectedPlan.slice(1);
+      showNotification(`Successfully upgraded to ${tierName} plan!`, 'success');
+      
+      // Reset generations used for new tier
+      currentUser.generationsUsed = 0;
+      updateDashboardStats();
+    }, 2000);
+  }
 }
 
 // Password management functions
@@ -1720,6 +1770,15 @@ function viewArtwork(artworkId) {
 // Initialize dashboard when page loads
 document.addEventListener('DOMContentLoaded', function() {
   initializeDashboard();
+  
+  // Wait for subscription manager to load and refresh data
+  setTimeout(() => {
+    if (window.subscriptionManager) {
+      loadUserData();
+      updateUserProfile();
+      loadSubscriptionStatus();
+    }
+  }, 1000);
   
   // Check URL hash for direct tab navigation
   const hash = window.location.hash.substring(1);
