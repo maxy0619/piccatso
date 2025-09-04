@@ -40,6 +40,34 @@
                     resultDiv.innerHTML += `<p>❌ Pro product not accessible: ${proResponse.status}</p>`;
                 }
                 
+                // Test Collections API
+                console.log('Testing Collections API...');
+                const collectionsResponse = await fetch('/collections/subscriptions/products.json');
+                console.log('Collections response status:', collectionsResponse.status);
+                
+                if (collectionsResponse.ok) {
+                    const collectionsData = await collectionsResponse.json();
+                    console.log('Collections data:', collectionsData);
+                    
+                    // Find Premium product
+                    const premiumProduct = collectionsData.products.find(p => p.id.toString() === '8482650226838');
+                    if (premiumProduct) {
+                        resultDiv.innerHTML += `<p>✅ Premium product found in collections. Variant ID: ${premiumProduct.variants[0].id}</p>`;
+                    } else {
+                        resultDiv.innerHTML += `<p>❌ Premium product not found in collections</p>`;
+                    }
+                    
+                    // Find Pro product
+                    const proProduct = collectionsData.products.find(p => p.id.toString() === '8482650554518');
+                    if (proProduct) {
+                        resultDiv.innerHTML += `<p>✅ Pro product found in collections. Variant ID: ${proProduct.variants[0].id}</p>`;
+                    } else {
+                        resultDiv.innerHTML += `<p>❌ Pro product not found in collections</p>`;
+                    }
+                } else {
+                    resultDiv.innerHTML += `<p>❌ Collections API not accessible: ${collectionsResponse.status}</p>`;
+                }
+                
             } catch (error) {
                 console.error('Error:', error);
                 resultDiv.innerHTML += `<p>❌ Error: ${error.message}</p>`;
