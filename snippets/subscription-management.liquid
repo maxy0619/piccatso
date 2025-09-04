@@ -113,6 +113,13 @@ let selectedAction = null;
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🎯 Subscription management page loaded');
+  
+  // Set customer ID for tracking
+  if (window.customer && window.customer.id) {
+    window.customerId = window.customer.id;
+    console.log('🎯 Customer ID set:', window.customerId);
+  }
+  
   loadUserData();
   updateCurrentSubscriptionDisplay();
   setupEventListeners();
@@ -263,28 +270,79 @@ document.getElementById('confirm-action-btn').addEventListener('click', function
   }
 });
 
-function processUpgrade(plan) {
+async function processUpgrade(plan) {
   console.log('🎯 Processing upgrade to:', plan);
   
   // Show loading state
   const confirmBtn = document.getElementById('confirm-action-btn');
   const originalText = confirmBtn.textContent;
-  confirmBtn.textContent = 'Processing...';
+  confirmBtn.textContent = 'Adding to Cart...';
   confirmBtn.disabled = true;
   
-  // For development stores with password protection, we need to use a different approach
-  // We'll redirect to the Shopify subscription app management URL which works with password protection
-  const subscriptionManagementUrl = window.PiccatsoSubscriptionConfig?.subscriptionManagementUrl || '/account';
-  
-  console.log('🎯 Redirecting to subscription management:', subscriptionManagementUrl);
-  
-  // Show notification with development store info
-  showNotification(`Development Store: Redirecting to subscription management for ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan...`, 'success');
-  
-  // Redirect to subscription management
-  setTimeout(() => {
-    window.location.href = subscriptionManagementUrl;
-  }, 1000);
+  try {
+    // Get subscription product configuration
+    const subscriptionUrls = window.PiccatsoSubscriptionConfig?.subscriptionUrls || {
+      premium: '/products/8482650226838',
+      pro: '/products/8482650554518'
+    };
+    
+    const productUrl = subscriptionUrls[plan];
+    console.log('🎯 Product URL:', productUrl);
+    
+    if (!productUrl) {
+      throw new Error('Subscription product not found');
+    }
+    
+    // Extract product ID from URL
+    const productId = productUrl.split('/products/')[1];
+    console.log('🎯 Product ID:', productId);
+    
+    // Add product to cart using Shopify Cart API
+    const response = await fetch('/cart/add.js', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        id: productId,
+        quantity: 1,
+        properties: {
+          'subscription_plan': plan,
+          'upgrade_from': 'free',
+          'customer_id': window.customerId || 'unknown'
+        }
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to add product to cart: ${response.status}`);
+    }
+    
+    const cartData = await response.json();
+    console.log('🎯 Product added to cart:', cartData);
+    
+    // Update button text
+    confirmBtn.textContent = 'Redirecting to Checkout...';
+    
+    // Show success notification
+    showNotification(`${plan.charAt(0).toUpperCase() + plan.slice(1)} plan added to cart! Redirecting to checkout...`, 'success');
+    
+    // Redirect to checkout
+    setTimeout(() => {
+      window.location.href = '/checkout';
+    }, 1500);
+    
+  } catch (error) {
+    console.error('❌ Error processing upgrade:', error);
+    
+    // Reset button
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
+    
+    // Show error notification
+    showNotification(`Error: ${error.message}. Please try again or contact support.`, 'error');
+  }
 }
 
 function processDowngrade(plan) {
