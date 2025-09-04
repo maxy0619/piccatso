@@ -2331,7 +2331,7 @@ function processSubscriptionUpgrade(plan) {
   // Show notification and redirect
   showNotification(`Redirecting to ${plan.charAt(0).toUpperCase() + plan.slice(1)} subscription page...`, 'success');
   
-  // Redirect to the subscription product page
+  // Redirect to the subscription product page (which will have the subscription widget)
   setTimeout(() => {
     window.location.href = productUrl;
   }, 1000);
@@ -2377,10 +2377,13 @@ function processSubscriptionDowngrade(plan) {
 }
 
 function manageBilling() {
-  // Redirect to Shopify's customer portal for billing management
-  showNotification('Redirecting to billing management...', 'success');
+  // Get subscription management URL from configuration
+  const subscriptionManagementUrl = window.PiccatsoSubscriptionConfig?.subscriptionManagementUrl || '/account';
+  
+  // Show notification and redirect
+  showNotification('Redirecting to subscription management...', 'success');
   setTimeout(() => {
-    window.location.href = '/account';
+    window.location.href = subscriptionManagementUrl;
   }, 500);
 }
 </script>

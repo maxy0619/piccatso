@@ -90,6 +90,8 @@
             {%- case block.type -%}
               {%- when '@app' -%}
                 {% render block %}
+                <!-- Subscription Widget -->
+                <div class="subscriptions_app_embed_block" style="margin: 1.5rem 0;"></div>
               {%- when 'text' -%}
                 <p
                   class="product__text inline-richtext{% if block.settings.text_style == 'uppercase' %} caption-with-letter-spacing{% elsif block.settings.text_style == 'subtitle' %} subtitle{% endif %}"
