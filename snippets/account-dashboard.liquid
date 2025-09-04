@@ -1550,14 +1550,28 @@ function loadAccountSettings() {
 
 // Upgrade modal functions
 function showSubscriptionModal() {
+  console.log('🎯 showSubscriptionModal called');
+  
   // Update current plan display
   updateCurrentPlanDisplay();
   
   // Show modal
-  document.getElementById('subscription-modal').style.display = 'flex';
+  const modal = document.getElementById('subscription-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    console.log('✅ Modal shown');
+  } else {
+    console.error('❌ Could not find subscription-modal element');
+  }
   
   // Hide action buttons initially
-  document.getElementById('subscription-actions').style.display = 'none';
+  const actionsDiv = document.getElementById('subscription-actions');
+  if (actionsDiv) {
+    actionsDiv.style.display = 'none';
+    console.log('✅ Action buttons hidden initially');
+  } else {
+    console.error('❌ Could not find subscription-actions element');
+  }
 }
 
 function closeSubscriptionModal() {
@@ -2238,6 +2252,8 @@ let selectedSubscriptionPlan = null;
 let selectedSubscriptionAction = null;
 
 function selectSubscriptionPlan(plan, action) {
+  console.log('🎯 selectSubscriptionPlan called with:', plan, action);
+  
   selectedSubscriptionPlan = plan;
   selectedSubscriptionAction = action;
   
@@ -2249,19 +2265,36 @@ function selectSubscriptionPlan(plan, action) {
   
   // Highlight selected plan
   const selectedElement = document.querySelector(`[data-plan="${plan}"]`);
-  selectedElement.style.borderColor = action === 'upgrade' ? '#10b981' : '#f59e0b';
-  selectedElement.style.backgroundColor = action === 'upgrade' ? '#f0fdf4' : '#fffbeb';
+  if (selectedElement) {
+    selectedElement.style.borderColor = action === 'upgrade' ? '#10b981' : '#f59e0b';
+    selectedElement.style.backgroundColor = action === 'upgrade' ? '#f0fdf4' : '#fffbeb';
+    console.log('✅ Plan selected and highlighted:', plan);
+  } else {
+    console.error('❌ Could not find element with data-plan:', plan);
+  }
   
   // Show action buttons and update content
   showSubscriptionAction(plan, action);
 }
 
 function showSubscriptionAction(plan, action) {
+  console.log('🎯 showSubscriptionAction called with:', plan, action);
+  
   const actionsDiv = document.getElementById('subscription-actions');
   const descriptionDiv = document.getElementById('action-description');
   const confirmBtn = document.getElementById('confirm-subscription-action');
   
+  if (!actionsDiv || !descriptionDiv || !confirmBtn) {
+    console.error('❌ Could not find required elements:', {
+      actionsDiv: !!actionsDiv,
+      descriptionDiv: !!descriptionDiv,
+      confirmBtn: !!confirmBtn
+    });
+    return;
+  }
+  
   actionsDiv.style.display = 'block';
+  console.log('✅ Action buttons shown');
   
   if (action === 'upgrade') {
     descriptionDiv.innerHTML = `
@@ -2386,4 +2419,30 @@ function manageBilling() {
     window.location.href = subscriptionManagementUrl;
   }, 500);
 }
+
+// Debug function to test subscription modal
+window.testSubscriptionModal = function() {
+  console.log('🧪 Testing subscription modal...');
+  
+  // Test if modal exists
+  const modal = document.getElementById('subscription-modal');
+  console.log('Modal element:', modal);
+  
+  // Test if subscription plans exist
+  const plans = document.querySelectorAll('.subscription-plan');
+  console.log('Subscription plans found:', plans.length);
+  
+  // Test if functions exist
+  console.log('Functions available:', {
+    showSubscriptionModal: typeof showSubscriptionModal,
+    selectSubscriptionPlan: typeof selectSubscriptionPlan,
+    showSubscriptionAction: typeof showSubscriptionAction
+  });
+  
+  // Test clicking a plan
+  if (plans.length > 0) {
+    console.log('Testing plan selection...');
+    selectSubscriptionPlan('premium', 'upgrade');
+  }
+};
 </script>
