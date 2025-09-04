@@ -393,7 +393,11 @@ async function handleSignUp(event) {
     // Simply redirect to Shopify's account creation page
     // Let Shopify handle all the CAPTCHA and form validation
     console.log('🔄 Redirecting to:', '/account');
-    window.location.href = '/account';
+    
+    // Add a small delay so we can see our logs
+    setTimeout(() => {
+      window.location.href = '/account';
+    }, 1000);
     
   } catch (error) {
     console.error('❌ Sign up error:', error);
@@ -490,11 +494,15 @@ function forceLogout() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('🚀 Page loaded, current URL:', window.location.href);
+  console.log('📄 Current page path:', window.location.pathname);
+  
   // Check URL for logout parameter
   const urlParams = new URLSearchParams(window.location.search);
   const isLogout = urlParams.get('logout') === 'true';
   
   if (isLogout) {
+    console.log('🚪 Logout parameter detected');
     // User wants to log out - clear data and show logout message
     localStorage.removeItem('piccatso_user');
     localStorage.removeItem('piccatso_user_data');
@@ -523,6 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Check for Shopify customer account success (if redirected from account creation)
   const shopifySuccess = urlParams.get('shopify_success') === 'true';
   if (shopifySuccess) {
+    console.log('✅ Shopify success parameter detected');
     showSuccess('signin', 'Account created successfully! You can now sign in with your email and password.');
     // Clean URL
     window.history.replaceState({}, document.title, window.location.pathname);
