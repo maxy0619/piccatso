@@ -356,6 +356,24 @@
         }
         
         function logoutUser() {
+          console.log('🚪 Logging out user...');
+          
+          // Clear all authentication data
+          localStorage.removeItem('piccatso_user');
+          localStorage.removeItem('piccatso_user_data');
+          sessionStorage.clear();
+          
+          // Clear any cached customer data
+          if (window.customer) {
+            window.customer = null;
+          }
+          
+          // Update header
+          window.dispatchEvent(new Event('piccatso-auth-change'));
+          if (window.refreshAuthButton) {
+            window.refreshAuthButton();
+          }
+          
           // Redirect to auth page with logout parameter
           window.location.href = '/pages/auth?logout=true';
         }

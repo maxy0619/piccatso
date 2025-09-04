@@ -461,6 +461,9 @@ document.addEventListener('DOMContentLoaded', function() {
       window.history.replaceState({}, document.title, window.location.pathname);
     }
     
+    // Clear any stale authentication data first
+    clearStaleAuthData();
+    
     // Check if user is already logged in via Shopify or local storage
     checkShopifyCustomerStatus();
     
@@ -469,24 +472,76 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Function to clear stale authentication data
+function clearStaleAuthData() {
+  try {
+    console.log('🧹 Clearing stale authentication data...');
+    
+    // Check if we're on auth pages - clear localStorage to prevent cross-user contamination
+    const currentPath = window.location.pathname;
+    if (currentPath.includes('/auth') || currentPath.includes('/login') || currentPath.includes('/register')) {
+      console.log('🧹 On auth page - clearing localStorage to prevent cross-user contamination');
+      localStorage.removeItem('piccatso_user');
+      localStorage.removeItem('piccatso_user_data');
+    }
+    
+    // Check if localStorage has old data that doesn't match current customer
+    const storedUser = localStorage.getItem('piccatso_user');
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        console.log('📦 Found stored user data:', userData);
+        
+        // If we have window.customer but it doesn't match stored data, clear it
+        if (window.customer && window.customer.id && userData.id !== window.customer.id) {
+          console.log('⚠️ Customer ID mismatch - clearing stored data');
+          console.log('Stored ID:', userData.id, 'Current customer ID:', window.customer.id);
+          localStorage.removeItem('piccatso_user');
+          localStorage.removeItem('piccatso_user_data');
+        }
+      } catch (e) {
+        console.log('⚠️ Invalid stored user data - clearing');
+        localStorage.removeItem('piccatso_user');
+        localStorage.removeItem('piccatso_user_data');
+      }
+    }
+  } catch (error) {
+    console.error('❌ Error clearing stale auth data:', error);
+  }
+}
+
 // Function to check if user is logged into Shopify
 async function checkShopifyCustomerStatus() {
   try {
     console.log('🔍 Checking Shopify customer status...');
     
+    // First, clear any old localStorage data to prevent cross-user contamination
+    const currentUrl = window.location.href;
+    if (currentUrl.includes('logout=true') || currentUrl.includes('login') || currentUrl.includes('register')) {
+      console.log('🧹 Clearing old authentication data...');
+      localStorage.removeItem('piccatso_user');
+      localStorage.removeItem('piccatso_user_data');
+    }
+    
     // Check if we have a Shopify customer object (this means user is logged in)
-    if (typeof window.Shopify !== 'undefined' && window.Shopify.customer) {
-      const customer = window.Shopify.customer;
-      console.log('📱 Shopify customer object found:', customer);
+    // But prioritize window.customer over window.Shopify.customer for accuracy
+    let customer = null;
+    if (window.customer && window.customer.id) {
+      customer = window.customer;
+      console.log('📱 Using window.customer (most current):', customer);
+    } else if (typeof window.Shopify !== 'undefined' && window.Shopify.customer) {
+      customer = window.Shopify.customer;
+      console.log('📱 Using window.Shopify.customer (fallback):', customer);
+    }
       
       if (customer.id) {
         console.log('✅ Valid Shopify customer ID:', customer.id);
         
         // User is logged into Shopify - sync with local system
         const userData = {
-          id: 'shopify_' + customer.id,
+          id: customer.id, // Use actual customer ID, not prefixed
           email: customer.email,
-          name: customer.first_name + ' ' + customer.last_name,
+          name: (customer.first_name + ' ' + customer.last_name).trim(),
           tier: 'free', // Default tier
           isLoggedIn: true,
           loginTime: new Date().toISOString(),
