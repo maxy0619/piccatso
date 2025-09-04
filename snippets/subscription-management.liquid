@@ -272,14 +272,14 @@ function processUpgrade(plan) {
   confirmBtn.textContent = 'Processing...';
   confirmBtn.disabled = true;
   
-  // For now, let's use a simple approach that works with password protection
-  // We'll redirect to the subscription management URL instead
+  // For development stores with password protection, we need to use a different approach
+  // We'll redirect to the Shopify subscription app management URL which works with password protection
   const subscriptionManagementUrl = window.PiccatsoSubscriptionConfig?.subscriptionManagementUrl || '/account';
   
   console.log('🎯 Redirecting to subscription management:', subscriptionManagementUrl);
   
-  // Show notification
-  showNotification(`Redirecting to subscription management for ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan...`, 'success');
+  // Show notification with development store info
+  showNotification(`Development Store: Redirecting to subscription management for ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan...`, 'success');
   
   // Redirect to subscription management
   setTimeout(() => {
