@@ -5,7 +5,8 @@
 
 class PiccatsoSubscriptionManager {
   constructor() {
-    this.customer = window.Shopify?.customer || null;
+    // Try multiple ways to get customer data
+    this.customer = window.Shopify?.customer || window.customer || null;
     this.currentTier = 'free';
     this.usageData = {
       monthlyGenerations: 0,
@@ -53,7 +54,20 @@ class PiccatsoSubscriptionManager {
   }
 
   async init() {
-    if (this.customer) {
+    console.log('🔍 Subscription manager initializing...');
+    console.log('🔍 Customer data:', this.customer);
+    
+    // Wait a bit for customer data to be available
+    if (!this.customer) {
+      setTimeout(() => {
+        this.customer = window.Shopify?.customer || window.customer || null;
+        console.log('🔍 Customer data after timeout:', this.customer);
+        if (this.customer) {
+          this.loadCustomerData();
+          this.updateUI();
+        }
+      }, 500);
+    } else {
       await this.loadCustomerData();
       this.updateUI();
     }
@@ -430,6 +444,37 @@ class PiccatsoSubscriptionManager {
         notification.parentNode.removeChild(notification);
       }
     }, 3000);
+  }
+
+  // Function to set customer tier for testing (this would normally be done server-side)
+  setCustomerTier(tier) {
+    if (this.customer && this.customer.id) {
+      console.log(`🔧 Setting customer ${this.customer.id} to ${tier} tier`);
+      
+      // Update local data
+      this.currentTier = tier;
+      
+      // Store in localStorage for persistence
+      const userData = {
+        id: this.customer.id,
+        email: this.customer.email,
+        name: `${this.customer.first_name} ${this.customer.last_name}`.trim(),
+        tier: tier,
+        isLoggedIn: true,
+        provider: 'shopify',
+        isFactory: tier === 'factory'
+      };
+      localStorage.setItem('piccatso_user', JSON.stringify(userData));
+      
+      // Update UI
+      this.updateUI();
+      
+      // Show notification
+      this.showNotification(`Customer tier set to ${tier}`, 'success');
+      
+      return true;
+    }
+    return false;
   }
 }
 

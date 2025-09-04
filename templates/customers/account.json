@@ -30,6 +30,12 @@
         "padding_bottom": 20
       }
     },
+    "customer_data_script": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<script>window.customer = {% if customer %}{{ customer | json }}{% else %}null{% endif %}; console.log('🔍 Customer data loaded:', window.customer);</script>"
+      }
+    },
     "account_dashboard": {
       "type": "custom-liquid",
       "settings": {
@@ -39,6 +45,7 @@
   },
   "order": [
     "account_hero",
+    "customer_data_script",
     "account_dashboard"
   ]
 }

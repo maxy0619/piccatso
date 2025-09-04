@@ -837,6 +837,18 @@
           <div>✅ <span id="pro-discount">10%</span> discount on all prints</div>
         </div>
       </div>
+      
+      <!-- Debug Section (for testing) -->
+      <div style="margin-top: 2rem; padding: 1.5rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 1rem;">
+        <h4 style="margin-bottom: 1rem; color: #1e293b;">🔧 Debug Tools</h4>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button onclick="testCustomerData()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Test Customer Data</button>
+          <button onclick="setTestTier('premium')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Premium Tier</button>
+          <button onclick="setTestTier('pro')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Pro Tier</button>
+          <button onclick="refreshDashboard()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Refresh Dashboard</button>
+        </div>
+        <div id="debug-output" style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 0.5rem; font-family: monospace; font-size: 1.2rem; color: #64748b;"></div>
+      </div>
     </div>
     
     <div class="dashboard-grid">
@@ -1195,6 +1207,12 @@ function showDashboardTab(tabName) {
 
 // Load user data from localStorage and Shopify customer
 function loadUserData() {
+  console.log('🔍 Loading user data...');
+  console.log('🔍 window.Shopify:', window.Shopify);
+  console.log('🔍 window.customer:', window.customer);
+  console.log('🔍 typeof customer:', typeof customer);
+  console.log('🔍 customer object:', customer);
+  
   // First, try to get data from subscription manager if available
   if (window.subscriptionManager && window.subscriptionManager.customer) {
     const customer = window.subscriptionManager.customer;
@@ -1206,7 +1224,7 @@ function loadUserData() {
     currentUser.provider = 'shopify';
     currentUser.isFactory = currentUser.tier === 'factory';
     
-    console.log('Loaded user data from subscription manager:', currentUser);
+    console.log('✅ Loaded user data from subscription manager:', currentUser);
     return;
   }
   
@@ -1767,6 +1785,42 @@ function viewArtwork(artworkId) {
   showNotification('Opening artwork viewer...', 'info');
 }
 
+// Debug functions
+function testCustomerData() {
+  const debugOutput = document.getElementById('debug-output');
+  const output = [];
+  
+  output.push('=== CUSTOMER DATA DEBUG ===');
+  output.push('window.Shopify:', window.Shopify);
+  output.push('window.customer:', window.customer);
+  output.push('window.subscriptionManager:', window.subscriptionManager);
+  output.push('subscriptionManager.customer:', window.subscriptionManager?.customer);
+  output.push('currentUser:', currentUser);
+  output.push('localStorage piccatso_user:', localStorage.getItem('piccatso_user'));
+  
+  debugOutput.innerHTML = output.map(line => `<div>${line}</div>`).join('');
+}
+
+function setTestTier(tier) {
+  if (window.subscriptionManager) {
+    window.subscriptionManager.setCustomerTier(tier);
+    setTimeout(() => {
+      loadUserData();
+      updateUserProfile();
+      loadSubscriptionStatus();
+    }, 500);
+  } else {
+    showNotification('Subscription manager not available', 'error');
+  }
+}
+
+function refreshDashboard() {
+  loadUserData();
+  updateUserProfile();
+  loadSubscriptionStatus();
+  showNotification('Dashboard refreshed', 'success');
+}
+
 // Initialize dashboard when page loads
 document.addEventListener('DOMContentLoaded', function() {
   initializeDashboard();
@@ -1774,11 +1828,27 @@ document.addEventListener('DOMContentLoaded', function() {
   // Wait for subscription manager to load and refresh data
   setTimeout(() => {
     if (window.subscriptionManager) {
+      // Force customer data into subscription manager
+      if (window.customer && !window.subscriptionManager.customer) {
+        window.subscriptionManager.customer = window.customer;
+        console.log('🔧 Manually set customer data in subscription manager');
+      }
       loadUserData();
       updateUserProfile();
       loadSubscriptionStatus();
     }
   }, 1000);
+  
+  // Also try after a longer delay
+  setTimeout(() => {
+    if (window.customer && window.subscriptionManager) {
+      window.subscriptionManager.customer = window.customer;
+      loadUserData();
+      updateUserProfile();
+      loadSubscriptionStatus();
+      console.log('🔧 Second attempt to load customer data');
+    }
+  }, 2000);
   
   // Check URL hash for direct tab navigation
   const hash = window.location.hash.substring(1);
