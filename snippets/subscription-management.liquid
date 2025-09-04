@@ -266,31 +266,24 @@ document.getElementById('confirm-action-btn').addEventListener('click', function
 function processUpgrade(plan) {
   console.log('🎯 Processing upgrade to:', plan);
   
-  // Get subscription URLs from configuration
-  const subscriptionUrls = window.PiccatsoSubscriptionConfig?.subscriptionUrls || {
-    premium: '/products/8482650226838',
-    pro: '/products/8482650554518'
-  };
-  
-  const productUrl = subscriptionUrls[plan];
-  
-  console.log('🎯 Subscription URLs:', subscriptionUrls);
-  console.log('🎯 Selected plan:', plan);
-  console.log('🎯 Product URL:', productUrl);
-  if (!productUrl) {
-    alert('Subscription product not found. Please contact support.');
-    return;
-  }
-  
   // Show loading state
   const confirmBtn = document.getElementById('confirm-action-btn');
   const originalText = confirmBtn.textContent;
-  confirmBtn.textContent = 'Redirecting...';
+  confirmBtn.textContent = 'Processing...';
   confirmBtn.disabled = true;
   
-  // Redirect to subscription product page
+  // For now, let's use a simple approach that works with password protection
+  // We'll redirect to the subscription management URL instead
+  const subscriptionManagementUrl = window.PiccatsoSubscriptionConfig?.subscriptionManagementUrl || '/account';
+  
+  console.log('🎯 Redirecting to subscription management:', subscriptionManagementUrl);
+  
+  // Show notification
+  showNotification(`Redirecting to subscription management for ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan...`, 'success');
+  
+  // Redirect to subscription management
   setTimeout(() => {
-    window.location.href = productUrl;
+    window.location.href = subscriptionManagementUrl;
   }, 1000);
 }
 
