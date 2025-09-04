@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Product Access</title>
+</head>
+<body>
+    <h1>Test Product Access</h1>
+    <button onclick="testProductAccess()">Test Product Access</button>
+    <div id="result"></div>
+
+    <script>
+        async function testProductAccess() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                // Test Premium product
+                console.log('Testing Premium product...');
+                const premiumResponse = await fetch('/products/8482650226838.js');
+                console.log('Premium response status:', premiumResponse.status);
+                
+                if (premiumResponse.ok) {
+                    const premiumProduct = await premiumResponse.json();
+                    console.log('Premium product:', premiumProduct);
+                    resultDiv.innerHTML += `<p>✅ Premium product accessible. Variant ID: ${premiumProduct.variants[0].id}</p>`;
+                } else {
+                    resultDiv.innerHTML += `<p>❌ Premium product not accessible: ${premiumResponse.status}</p>`;
+                }
+                
+                // Test Pro product
+                console.log('Testing Pro product...');
+                const proResponse = await fetch('/products/8482650554518.js');
+                console.log('Pro response status:', proResponse.status);
+                
+                if (proResponse.ok) {
+                    const proProduct = await proResponse.json();
+                    console.log('Pro product:', proProduct);
+                    resultDiv.innerHTML += `<p>✅ Pro product accessible. Variant ID: ${proProduct.variants[0].id}</p>`;
+                } else {
+                    resultDiv.innerHTML += `<p>❌ Pro product not accessible: ${proResponse.status}</p>`;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                resultDiv.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

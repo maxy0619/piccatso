@@ -297,6 +297,26 @@ async function processUpgrade(plan) {
     const productId = productUrl.split('/products/')[1];
     console.log('🎯 Product ID:', productId);
     
+    // Try to fetch the product to get the variant ID
+    let variantId;
+    try {
+      const productResponse = await fetch(`/products/${productId}.js`);
+      if (productResponse.ok) {
+        const product = await productResponse.json();
+        console.log('🎯 Product data:', product);
+        variantId = product.variants[0].id;
+        console.log('🎯 Variant ID from product API:', variantId);
+      } else {
+        console.log('⚠️ Product API not accessible, using product ID as variant ID');
+        variantId = productId;
+      }
+    } catch (error) {
+      console.log('⚠️ Product API error, using product ID as variant ID:', error);
+      variantId = productId;
+    }
+    
+    console.log('🎯 Final variant ID:', variantId);
+    
     // Add product to cart using Shopify Cart API
     const response = await fetch('/cart/add.js', {
       method: 'POST',
@@ -305,7 +325,7 @@ async function processUpgrade(plan) {
         'Accept': 'application/json'
       },
       body: JSON.stringify({
-        id: productId,
+        id: variantId,
         quantity: 1,
         properties: {
           'subscription_plan': plan,
@@ -316,7 +336,9 @@ async function processUpgrade(plan) {
     });
     
     if (!response.ok) {
-      throw new Error(`Failed to add product to cart: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Cart API Error:', response.status, errorText);
+      throw new Error(`Failed to add product to cart: ${response.status} - ${errorText}`);
     }
     
     const cartData = await response.json();
