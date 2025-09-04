@@ -123,7 +123,7 @@ class PicatsoPODIntegration {
     }
 
     const baseCost = parseFloat(variant.price);
-    const customerPrice = this.calculateCustomerPrice(baseCost);
+    const customerPrice = this.calculateCustomerPrice(baseCost, window.subscriptionManager);
 
     return {
       base_cost: baseCost,
@@ -135,11 +135,22 @@ class PicatsoPODIntegration {
   }
 
   /**
-   * Calculate customer price with markup
+   * Calculate customer price with markup and subscription discounts
    */
-  calculateCustomerPrice(baseCost) {
+  calculateCustomerPrice(baseCost, subscriptionManager = null) {
     const markup = baseCost * (this.markupPercentage / 100);
-    return Math.ceil((baseCost + markup) * 100) / 100; // Round up to nearest cent
+    let finalPrice = Math.ceil((baseCost + markup) * 100) / 100; // Round up to nearest cent
+    
+    // Apply Pro tier discount if applicable
+    if (subscriptionManager && subscriptionManager.hasFeature('printDiscount')) {
+      const discount = subscriptionManager.getPrintDiscount();
+      if (discount > 0) {
+        finalPrice = finalPrice * (1 - discount / 100);
+        finalPrice = Math.ceil(finalPrice * 100) / 100;
+      }
+    }
+    
+    return finalPrice;
   }
 
   /**
@@ -170,7 +181,9 @@ class PicatsoPODIntegration {
       'printful_variant_id': this.getVariantId(orderData.productType, orderData.size),
       'design_url': orderData.imageUrl,
       'piccatso_render_id': orderData.renderId,
-      'piccatso_style': orderData.styleName
+      'piccatso_style': orderData.styleName,
+      'piccatso_subscription_tier': window.subscriptionManager?.currentTier || 'free',
+      'piccatso_discount_applied': window.subscriptionManager?.getPrintDiscount() || 0
     };
 
     // Return success - the actual order creation will be handled by Shopify

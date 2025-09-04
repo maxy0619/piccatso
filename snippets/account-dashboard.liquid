@@ -188,6 +188,185 @@
       transform: translateY(-2px);
     }
     
+    /* Order Management Styles */
+    .order-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .order-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .order-info h4 {
+      margin: 0;
+      color: #1e293b;
+      font-size: 1.6rem;
+    }
+    
+    .order-date {
+      margin: 0.5rem 0 0 0;
+      color: #64748b;
+      font-size: 1.4rem;
+    }
+    
+    .order-status {
+      font-weight: 600;
+      font-size: 1.4rem;
+    }
+    
+    .order-items {
+      margin-bottom: 1.5rem;
+    }
+    
+    .order-item {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    
+    .order-item:last-child {
+      border-bottom: none;
+    }
+    
+    .item-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .item-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .no-image {
+      font-size: 2rem;
+    }
+    
+    .item-details {
+      flex: 1;
+    }
+    
+    .item-details h5 {
+      margin: 0 0 0.5rem 0;
+      color: #1e293b;
+      font-size: 1.4rem;
+    }
+    
+    .item-details p {
+      margin: 0.25rem 0;
+      color: #64748b;
+      font-size: 1.2rem;
+    }
+    
+    .item-discount {
+      color: #10b981 !important;
+      font-weight: 600;
+    }
+    
+    .item-price {
+      font-weight: 600;
+      color: #1e293b;
+      font-size: 1.4rem;
+    }
+    
+    .order-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .order-total {
+      font-size: 1.6rem;
+      color: #1e293b;
+    }
+    
+    .order-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .track-button, .reorder-button {
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+    }
+    
+    .track-button {
+      background: #3b82f6;
+      color: white;
+    }
+    
+    .track-button:hover {
+      background: #2563eb;
+    }
+    
+    .reorder-button {
+      background: #8b5cf6;
+      color: white;
+    }
+    
+    .reorder-button:hover {
+      background: #7c3aed;
+    }
+    
+    .tracking-info {
+      margin-top: 1.5rem;
+      padding: 1.5rem;
+      background: #f8fafc;
+      border-radius: 0.5rem;
+    }
+    
+    .tracking-info h5 {
+      margin: 0 0 1rem 0;
+      color: #1e293b;
+    }
+    
+    .tracking-info p {
+      margin: 0.5rem 0;
+      color: #64748b;
+    }
+    
+    .track-link {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 0.8rem 1.5rem;
+      background: #10b981;
+      color: white;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .track-link:hover {
+      background: #059669;
+    }
+    
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
@@ -498,6 +677,8 @@
       
       .dashboard-nav {
         flex-wrap: wrap;
+        overflow-x: auto;
+        padding-bottom: 1rem;
       }
       
       .user-profile-header {
@@ -508,6 +689,81 @@
       
       .profile-tier {
         justify-content: center;
+      }
+      
+      /* Mobile-specific subscription styles */
+      .usage-container {
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+      }
+      
+      .upgrade-options {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      
+      .modal-content {
+        padding: 2rem;
+        margin: 1rem;
+        max-height: 90vh;
+      }
+      
+      /* Pro benefits mobile layout */
+      #pro-benefits div {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      
+      /* Artwork grid mobile */
+      .artwork-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      
+      .artwork-card {
+        padding: 1rem;
+      }
+      
+      .artwork-overlay {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      
+      .download-btn, .delete-btn {
+        padding: 0.5rem;
+        font-size: 1.2rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .account-dashboard {
+        padding: 0.5rem;
+      }
+      
+      .dashboard-nav {
+        padding: 0.5rem;
+      }
+      
+      .nav-tab {
+        padding: 0.6rem 0.8rem;
+        font-size: 1.1rem;
+      }
+      
+      .usage-container {
+        padding: 1rem;
+      }
+      
+      .artwork-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .modal-content {
+        padding: 1.5rem;
+        margin: 0.5rem;
+      }
+      
+      .upgrade-option {
+        padding: 1.5rem;
       }
     }
   </style>
@@ -569,6 +825,17 @@
         <button onclick="showUpgradeOptions()" class="upgrade-button" style="background: #8b5cf6; color: white; padding: 1rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
           Upgrade Plan
         </button>
+      </div>
+      
+      <!-- Pro Tier Benefits Display -->
+      <div id="pro-benefits" style="display: none; margin-top: 2rem; padding: 1.5rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: white; border-radius: 1rem;">
+        <h4 style="margin-bottom: 1rem;">🎉 Pro Tier Benefits</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 1.4rem;">
+          <div>✅ Clean downloads (no watermark)</div>
+          <div>✅ Commercial usage rights</div>
+          <div>✅ Unlimited art history</div>
+          <div>✅ <span id="pro-discount">10%</span> discount on all prints</div>
+        </div>
       </div>
     </div>
     
@@ -719,10 +986,20 @@
         <div class="card-icon success">📦</div>
         <div class="card-title">Order History</div>
       </div>
+      
+      <!-- Order Filters -->
+      <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
+        <button class="action-button secondary" onclick="filterOrders('all')">All Orders</button>
+        <button class="action-button secondary" onclick="filterOrders('pending')">Pending</button>
+        <button class="action-button secondary" onclick="filterOrders('shipped')">Shipped</button>
+        <button class="action-button secondary" onclick="filterOrders('delivered')">Delivered</button>
+      </div>
+      
       <div id="order-history">
         <div class="empty-state">
           <div class="empty-state-icon">📦</div>
           <p>No orders yet.<br>Your print orders will appear here!</p>
+          <a href="/" class="action-button">Start Creating Art</a>
         </div>
       </div>
     </div>

@@ -202,6 +202,18 @@ class PiccatsoSubscriptionManager {
       text.textContent = `${this.usageData.monthlyGenerations} / ${this.tierLimits[this.currentTier].monthlyGenerations} used`;
     });
 
+    // Update remaining generations
+    const remainingElements = document.querySelectorAll('#remaining-generations');
+    remainingElements.forEach(el => {
+      el.textContent = this.getRemainingGenerations();
+    });
+
+    // Show/hide Pro benefits
+    const proBenefits = document.getElementById('pro-benefits');
+    if (proBenefits) {
+      proBenefits.style.display = this.currentTier === 'pro' ? 'block' : 'none';
+    }
+
     // Update feature availability
     this.updateFeatureAvailability();
   }
