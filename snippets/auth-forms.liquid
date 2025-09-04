@@ -343,15 +343,18 @@ async function handleSignIn(event) {
   const email = document.getElementById('signin-email').value;
   const password = document.getElementById('signin-password').value;
   
+  console.log('🔐 Attempting sign in with:', { email, password: password ? '***' : 'empty' });
+  
   try {
     showSuccess('signin', 'Redirecting to Shopify sign in...');
     
     // Simply redirect to Shopify's login page
     // Let Shopify handle all the CAPTCHA and form validation
+    console.log('🔄 Redirecting to:', '/account/login');
     window.location.href = '/account/login';
     
   } catch (error) {
-    console.error('Sign in error:', error);
+    console.error('❌ Sign in error:', error);
     showError('signin', 'Error redirecting to sign in. Please try again.');
   }
 }
@@ -364,6 +367,13 @@ async function handleSignUp(event) {
   const email = document.getElementById('signup-email').value;
   const password = document.getElementById('signup-password').value;
   const confirmPassword = document.getElementById('signup-confirm').value;
+  
+  console.log('📝 Attempting sign up with:', { 
+    name, 
+    email, 
+    password: password ? '***' : 'empty',
+    confirmPassword: confirmPassword ? '***' : 'empty'
+  });
   
   // Validate passwords match
   if (password !== confirmPassword) {
@@ -382,10 +392,11 @@ async function handleSignUp(event) {
     
     // Simply redirect to Shopify's account creation page
     // Let Shopify handle all the CAPTCHA and form validation
+    console.log('🔄 Redirecting to:', '/account');
     window.location.href = '/account';
     
   } catch (error) {
-    console.error('Sign up error:', error);
+    console.error('❌ Sign up error:', error);
     showError('signup', 'Error redirecting to account creation. Please try again.');
   }
 }
@@ -524,11 +535,16 @@ document.addEventListener('DOMContentLoaded', function() {
 // Function to check if user is logged into Shopify
 async function checkShopifyCustomerStatus() {
   try {
+    console.log('🔍 Checking Shopify customer status...');
+    
     // Check if we have a Shopify customer object (this means user is logged in)
     if (typeof window.Shopify !== 'undefined' && window.Shopify.customer) {
       const customer = window.Shopify.customer;
+      console.log('📱 Shopify customer object found:', customer);
       
       if (customer.id) {
+        console.log('✅ Valid Shopify customer ID:', customer.id);
+        
         // User is logged into Shopify - sync with local system
         const userData = {
           id: 'shopify_' + customer.id,
@@ -540,6 +556,8 @@ async function checkShopifyCustomerStatus() {
           loginMethod: 'shopify',
           shopifyCustomerId: customer.id
         };
+        
+        console.log('💾 Storing user data:', userData);
         
         // Store in localStorage
         localStorage.setItem('piccatso_user', JSON.stringify(userData));
@@ -561,12 +579,21 @@ async function checkShopifyCustomerStatus() {
         logoutSection.querySelector('p').textContent = `You are logged in as ${userData.name} (${userData.tier} tier). Click below to sign out.`;
         
         return;
+      } else {
+        console.log('❌ No valid customer ID found');
       }
+    } else {
+      console.log('❌ No Shopify customer object found');
+      console.log('🔍 window.Shopify:', window.Shopify);
     }
     
     // Check local storage for existing user
     const user = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+    console.log('💾 Local storage user data:', user);
+    
     if (user.email && user.isLoggedIn) {
+      console.log('✅ Local user found:', user.email);
+      
       // Show logout section
       document.getElementById('logout-section').style.display = 'block';
       
@@ -576,10 +603,12 @@ async function checkShopifyCustomerStatus() {
       const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
       
       logoutSection.querySelector('p').textContent = `You are logged in as ${userName} (${tierName} tier). Click below to sign out.`;
+    } else {
+      console.log('❌ No local user found');
     }
     
   } catch (error) {
-    console.error('Error checking Shopify customer status:', error);
+    console.error('❌ Error checking Shopify customer status:', error);
   }
 }
 </script>
