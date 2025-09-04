@@ -53,6 +53,19 @@
                     const premiumProduct = collectionsData.products.find(p => p.id.toString() === '8482650226838');
                     if (premiumProduct) {
                         resultDiv.innerHTML += `<p>✅ Premium product found in collections. Variant ID: ${premiumProduct.variants[0].id}</p>`;
+                        
+                        // Check for selling plans
+                        if (premiumProduct.selling_plan_groups && premiumProduct.selling_plan_groups.length > 0) {
+                            const sellingPlanGroup = premiumProduct.selling_plan_groups[0];
+                            if (sellingPlanGroup.selling_plans && sellingPlanGroup.selling_plans.length > 0) {
+                                const sellingPlanId = sellingPlanGroup.selling_plans[0].id;
+                                resultDiv.innerHTML += `<p>✅ Premium selling plan ID: ${sellingPlanId}</p>`;
+                            } else {
+                                resultDiv.innerHTML += `<p>⚠️ Premium product has selling plan groups but no selling plans</p>`;
+                            }
+                        } else {
+                            resultDiv.innerHTML += `<p>⚠️ Premium product has no selling plan groups</p>`;
+                        }
                     } else {
                         resultDiv.innerHTML += `<p>❌ Premium product not found in collections</p>`;
                     }
@@ -61,6 +74,19 @@
                     const proProduct = collectionsData.products.find(p => p.id.toString() === '8482650554518');
                     if (proProduct) {
                         resultDiv.innerHTML += `<p>✅ Pro product found in collections. Variant ID: ${proProduct.variants[0].id}</p>`;
+                        
+                        // Check for selling plans
+                        if (proProduct.selling_plan_groups && proProduct.selling_plan_groups.length > 0) {
+                            const sellingPlanGroup = proProduct.selling_plan_groups[0];
+                            if (sellingPlanGroup.selling_plans && sellingPlanGroup.selling_plans.length > 0) {
+                                const sellingPlanId = sellingPlanGroup.selling_plans[0].id;
+                                resultDiv.innerHTML += `<p>✅ Pro selling plan ID: ${sellingPlanId}</p>`;
+                            } else {
+                                resultDiv.innerHTML += `<p>⚠️ Pro product has selling plan groups but no selling plans</p>`;
+                            }
+                        } else {
+                            resultDiv.innerHTML += `<p>⚠️ Pro product has no selling plan groups</p>`;
+                        }
                     } else {
                         resultDiv.innerHTML += `<p>❌ Pro product not found in collections</p>`;
                     }

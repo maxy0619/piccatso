@@ -307,6 +307,10 @@ async function processUpgrade(plan) {
         console.log('🎯 Product data from product API:', product);
         variantId = product.variants[0].id;
         console.log('🎯 Variant ID from product API:', variantId);
+        
+        // Store product data for selling plan access
+        window.lastProductData = product;
+        console.log('🎯 Stored product data for selling plan access');
       } else {
         console.log('⚠️ Product API not accessible, trying collections API');
         
@@ -322,6 +326,10 @@ async function processUpgrade(plan) {
             console.log('🎯 Found product in collections:', product);
             variantId = product.variants[0].id;
             console.log('🎯 Variant ID from collections:', variantId);
+            
+            // Store product data for selling plan access
+            window.lastProductData = product;
+            console.log('🎯 Stored product data for selling plan access');
           } else {
             console.log('⚠️ Product not found in collections, using product ID as variant ID');
             variantId = productId;
@@ -338,22 +346,45 @@ async function processUpgrade(plan) {
     
     console.log('🎯 Final variant ID:', variantId);
     
-    // Add product to cart using Shopify Cart API
+    // For subscription products, we need to use the subscription selling plan
+    // First, get the selling plan ID from the product data
+    let sellingPlanId = null;
+    
+    // Try to get selling plan from product data
+    if (window.lastProductData && window.lastProductData.selling_plan_groups) {
+      const sellingPlanGroup = window.lastProductData.selling_plan_groups[0];
+      if (sellingPlanGroup && sellingPlanGroup.selling_plans) {
+        sellingPlanId = sellingPlanGroup.selling_plans[0].id;
+        console.log('🎯 Selling plan ID:', sellingPlanId);
+      }
+    }
+    
+    // Add product to cart with selling plan
+    const cartPayload = {
+      id: variantId,
+      quantity: 1,
+      properties: {
+        'subscription_plan': plan,
+        'upgrade_from': 'free',
+        'customer_id': window.customerId || 'unknown'
+      }
+    };
+    
+    // Add selling plan if available
+    if (sellingPlanId) {
+      cartPayload.selling_plan = sellingPlanId;
+      console.log('🎯 Adding with selling plan:', sellingPlanId);
+    } else {
+      console.log('⚠️ No selling plan found, trying without selling plan');
+    }
+    
     const response = await fetch('/cart/add.js', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        id: variantId,
-        quantity: 1,
-        properties: {
-          'subscription_plan': plan,
-          'upgrade_from': 'free',
-          'customer_id': window.customerId || 'unknown'
-        }
-      })
+      body: JSON.stringify(cartPayload)
     });
     
     if (!response.ok) {
