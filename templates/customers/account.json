@@ -39,7 +39,7 @@
     "account_dashboard": {
       "type": "custom-liquid",
       "settings": {
-        "custom_liquid": "{% render 'account-dashboard' %}"
+        "custom_liquid": "{% if customer %}{% render 'account-dashboard' %}{% else %}<div style='text-align: center; padding: 4rem 2rem;'><h2>🔐 Authentication Required</h2><p>You need to be logged in to access your account dashboard.</p><a href='/account/login' class='button button--primary' style='margin-top: 1rem;'>Sign In</a></div>{% endif %}"
       }
     }
   },

@@ -303,12 +303,29 @@
           const authContainer = document.getElementById('auth-nav-container');
           
           console.log('Updating auth button. User data:', user); // Debug log
+          console.log('Shopify customer:', window.customer); // Debug log
+          
+          // Check if user is logged in via Shopify customer or localStorage
+          const isLoggedIn = (user.email && user.isLoggedIn) || (window.customer && window.customer.id);
           
           if (authContainer) {
-            if (user.email && user.isLoggedIn) {
+            if (isLoggedIn) {
               // User is logged in - show account dropdown
-              const userName = user.name ? user.name.split(' ')[0] : 'Account';
-              const tierName = user.tier ? user.tier.charAt(0).toUpperCase() + user.tier.slice(1) : 'Free';
+              let userName = 'Account';
+              let tierName = 'Free';
+              
+              // Try to get name from Shopify customer first, then localStorage
+              if (window.customer && window.customer.first_name) {
+                userName = window.customer.first_name;
+              } else if (user.name) {
+                userName = user.name.split(' ')[0];
+              }
+              
+              // Get tier from localStorage (Shopify doesn't have this)
+              if (user.tier) {
+                tierName = user.tier.charAt(0).toUpperCase() + user.tier.slice(1);
+              }
+              
               const tierColor = user.tier === 'factory' ? '#ef4444' : user.tier === 'pro' ? '#10b981' : user.tier === 'premium' ? '#8B5CF6' : '#64748b';
               
               authContainer.innerHTML = `
@@ -343,8 +360,43 @@
           window.location.href = '/pages/auth?logout=true';
         }
         
+        // Function to sync Shopify customer data with localStorage
+        function syncShopifyCustomerData() {
+          if (window.customer && window.customer.id) {
+            console.log('🔄 Syncing Shopify customer data...');
+            
+            // Get current localStorage data
+            const currentUser = JSON.parse(localStorage.getItem('piccatso_user') || '{}');
+            
+            // Update with Shopify customer data
+            const updatedUser = {
+              ...currentUser,
+              id: window.customer.id,
+              email: window.customer.email || currentUser.email,
+              name: window.customer.first_name && window.customer.last_name 
+                ? `${window.customer.first_name} ${window.customer.last_name}`
+                : currentUser.name,
+              isLoggedIn: true,
+              provider: 'shopify'
+            };
+            
+            // Save to localStorage
+            localStorage.setItem('piccatso_user', JSON.stringify(updatedUser));
+            console.log('✅ Synced customer data:', updatedUser);
+            
+            // Update auth button
+            updateAuthButton();
+          }
+        }
+        
         // Update on page load
-        document.addEventListener('DOMContentLoaded', updateAuthButton);
+        document.addEventListener('DOMContentLoaded', function() {
+          // Wait a bit for customer data to load, then sync
+          setTimeout(() => {
+            syncShopifyCustomerData();
+            updateAuthButton();
+          }, 100);
+        });
         
         // Update when storage changes (for cross-tab sync)
         window.addEventListener('storage', updateAuthButton);
