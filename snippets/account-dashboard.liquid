@@ -821,9 +821,12 @@
         </p>
       </div>
       
-      <div style="margin-top: 2rem;">
-        <button onclick="showUpgradeOptions()" class="upgrade-button" style="background: #8b5cf6; color: white; padding: 1rem 2rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
-          Upgrade Plan
+      <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <button onclick="showSubscriptionModal()" class="action-button" style="flex: 1; background: #10b981; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+          Manage Subscription
+        </button>
+        <button onclick="manageBilling()" class="action-button secondary" style="flex: 1; background: #64748b; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+          Billing
         </button>
       </div>
       
@@ -878,9 +881,7 @@
         <div class="progress-bar">
           <div class="progress-fill" id="usage-progress" style="width: 0%"></div>
         </div>
-        <button class="action-button" onclick="showUpgradeModal()">
-          Upgrade Subscription
-        </button>
+        <!-- Subscription management moved to main subscription section -->
       </div>
       
       <!-- Quick Stats Card -->
@@ -1081,25 +1082,7 @@
         </div>
       </div>
       
-      <!-- Subscription Management -->
-      <div class="dashboard-card">
-        <div class="card-header">
-          <div class="card-icon warning">💳</div>
-          <div class="card-title">Subscription Management</div>
-        </div>
-        <div id="subscription-details">
-          <p style="margin-bottom: 1rem;">Current Plan: <strong id="current-plan">Free Tier</strong></p>
-          <p style="margin-bottom: 1rem;">Next Billing: <span id="next-billing">No billing scheduled</span></p>
-        </div>
-        <div style="display: flex; gap: 1rem;">
-          <button class="action-button" onclick="showSubscriptionModal()">
-            Manage Subscription
-          </button>
-          <button class="action-button secondary" onclick="manageBilling()">
-            Manage Billing
-          </button>
-        </div>
-      </div>
+      <!-- Subscription management consolidated into main subscription section above -->
       
     </div>
   </div>
@@ -1467,8 +1450,8 @@ function loadArtworkCollection() {
       <div class="empty-state">
         <div class="empty-state-icon">🔒</div>
         <p>Artwork history is not available on the Free tier.<br>Upgrade to Premium to save your creations!</p>
-        <button class="action-button" onclick="showUpgradeModal()">
-          Upgrade to Premium
+        <button class="action-button" onclick="showSubscriptionModal()">
+          Manage Subscription
         </button>
       </div>
     `;
@@ -2325,63 +2308,33 @@ function updateCurrentPlanDisplay() {
 }
 
 function processSubscriptionUpgrade(plan) {
-  // Get subscription product IDs (you'll need to replace these with your actual product IDs)
-  const subscriptionProducts = {
-    premium: {
-      productId: 'gid://shopify/Product/YOUR_PREMIUM_PRODUCT_ID',
-      variantId: 'gid://shopify/ProductVariant/YOUR_PREMIUM_VARIANT_ID'
-    },
-    pro: {
-      productId: 'gid://shopify/Product/YOUR_PRO_PRODUCT_ID', 
-      variantId: 'gid://shopify/ProductVariant/YOUR_PRO_VARIANT_ID'
-    }
-  };
-  
-  const product = subscriptionProducts[plan];
-  if (!product) {
-    showNotification('Subscription product not found. Please contact support.', 'error');
-    return;
-  }
-  
   // Show loading state
   const confirmBtn = document.getElementById('confirm-subscription-action');
   const originalText = confirmBtn.textContent;
   confirmBtn.textContent = 'Processing...';
   confirmBtn.disabled = true;
   
-  // Add subscription to cart and redirect to checkout
-  fetch('/cart/add.js', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      id: product.variantId,
-      quantity: 1,
-      properties: {
-        'Subscription Plan': plan.charAt(0).toUpperCase() + plan.slice(1),
-        'Customer ID': currentUser.id,
-        'Upgrade Action': 'upgrade'
-      }
-    })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.status === 422) {
-      throw new Error(data.description || 'Failed to add to cart');
-    }
-    
-    // Redirect to checkout
-    window.location.href = '/checkout';
-  })
-  .catch(error => {
-    console.error('Error adding subscription to cart:', error);
-    showNotification('Failed to process subscription upgrade. Please try again.', 'error');
-    
-    // Reset button
+  // Get subscription URLs from configuration
+  const subscriptionUrls = window.PiccatsoSubscriptionConfig?.subscriptionUrls || {
+    premium: '/products/premium-subscription', // Default fallback
+    pro: '/products/pro-subscription' // Default fallback
+  };
+  
+  const productUrl = subscriptionUrls[plan];
+  if (!productUrl) {
+    showNotification('Subscription product not found. Please contact support.', 'error');
     confirmBtn.textContent = originalText;
     confirmBtn.disabled = false;
-  });
+    return;
+  }
+  
+  // Show notification and redirect
+  showNotification(`Redirecting to ${plan.charAt(0).toUpperCase() + plan.slice(1)} subscription page...`, 'success');
+  
+  // Redirect to the subscription product page
+  setTimeout(() => {
+    window.location.href = productUrl;
+  }, 1000);
 }
 
 function processSubscriptionDowngrade(plan) {
@@ -2424,7 +2377,10 @@ function processSubscriptionDowngrade(plan) {
 }
 
 function manageBilling() {
-  // Redirect to Shopify's customer portal or subscription management
-  window.location.href = '/account';
+  // Redirect to Shopify's customer portal for billing management
+  showNotification('Redirecting to billing management...', 'success');
+  setTimeout(() => {
+    window.location.href = '/account';
+  }, 500);
 }
 </script>
