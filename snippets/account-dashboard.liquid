@@ -1271,26 +1271,37 @@ function loadUserData() {
   }
   
   // If we have customer data but incomplete localStorage, update it
-  if (window.customer && window.customer.id && (!currentUser.email || currentUser.email === 'guest@piccatso.com')) {
+  if (window.customer && typeof window.customer === 'object' && window.customer.id && (!currentUser.email || currentUser.email === 'guest@piccatso.com' || currentUser.name === 'undefined undefined')) {
     console.log('🔧 Updating incomplete customer data from window.customer');
-    currentUser.email = window.customer.email || '';
-    currentUser.name = (window.customer.first_name + ' ' + window.customer.last_name).trim() || '';
-    currentUser.isLoggedIn = true;
-    currentUser.id = window.customer.id || '';
-    currentUser.provider = 'shopify';
     
-    // Update localStorage with complete data
-    const completeUserData = {
-      id: window.customer.id,
-      email: window.customer.email,
-      name: currentUser.name,
-      tier: currentUser.tier,
-      isLoggedIn: true,
-      provider: 'shopify',
-      isFactory: currentUser.tier === 'factory'
-    };
-    localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
-    console.log('💾 Updated localStorage with complete data:', completeUserData);
+    try {
+      const customerId = window.customer.id || '';
+      const customerEmail = window.customer.email || '';
+      const firstName = window.customer.first_name || '';
+      const lastName = window.customer.last_name || '';
+      const customerName = (firstName + ' ' + lastName).trim() || 'Customer';
+      
+      currentUser.email = customerEmail;
+      currentUser.name = customerName;
+      currentUser.isLoggedIn = true;
+      currentUser.id = customerId;
+      currentUser.provider = 'shopify';
+      
+      // Update localStorage with complete data
+      const completeUserData = {
+        id: customerId,
+        email: customerEmail,
+        name: customerName,
+        tier: currentUser.tier,
+        isLoggedIn: true,
+        provider: 'shopify',
+        isFactory: currentUser.tier === 'factory'
+      };
+      localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
+      console.log('💾 Updated localStorage with complete data:', completeUserData);
+    } catch (error) {
+      console.error('❌ Error updating customer data:', error);
+    }
   }
   
   // Set defaults if no data
@@ -1820,21 +1831,38 @@ function testCustomerData() {
   
   output.push('=== CUSTOMER DATA DEBUG ===');
   output.push('window.Shopify:', JSON.stringify(window.Shopify, null, 2));
-  output.push('window.customer:', JSON.stringify(window.customer, null, 2));
+  
+  // Handle customer data safely
+  try {
+    if (window.customer && typeof window.customer === 'object') {
+      output.push('window.customer: Available (object)');
+      if (window.customer.id) output.push('✅ Customer ID:', window.customer.id);
+      if (window.customer.email) output.push('✅ Customer email:', window.customer.email);
+      if (window.customer.first_name) output.push('✅ First name:', window.customer.first_name);
+      if (window.customer.last_name) output.push('✅ Last name:', window.customer.last_name);
+      if (window.customer.tags) output.push('✅ Customer tags:', window.customer.tags);
+    } else {
+      output.push('window.customer:', window.customer);
+    }
+  } catch (e) {
+    output.push('window.customer: Error accessing -', e.message);
+  }
+  
   output.push('window.subscriptionManager:', window.subscriptionManager ? 'Available' : 'Not Available');
-  output.push('subscriptionManager.customer:', JSON.stringify(window.subscriptionManager?.customer, null, 2));
+  
+  try {
+    if (window.subscriptionManager?.customer) {
+      output.push('subscriptionManager.customer: Available');
+      if (window.subscriptionManager.customer.id) output.push('✅ SM Customer ID:', window.subscriptionManager.customer.id);
+    } else {
+      output.push('subscriptionManager.customer: Not available');
+    }
+  } catch (e) {
+    output.push('subscriptionManager.customer: Error -', e.message);
+  }
+  
   output.push('currentUser:', JSON.stringify(currentUser, null, 2));
   output.push('localStorage piccatso_user:', localStorage.getItem('piccatso_user'));
-  
-  // Also check if customer data is being loaded properly
-  if (window.customer && window.customer.id) {
-    output.push('✅ Customer ID found:', window.customer.id);
-    output.push('✅ Customer email:', window.customer.email);
-    output.push('✅ Customer name:', window.customer.first_name + ' ' + window.customer.last_name);
-    output.push('✅ Customer tags:', window.customer.tags);
-  } else {
-    output.push('❌ No customer data found');
-  }
   
   debugOutput.innerHTML = output.map(line => `<div style="margin-bottom: 0.5rem;">${line}</div>`).join('');
 }
@@ -1872,39 +1900,63 @@ function refreshDashboard() {
 function forceLoadCustomerData() {
   console.log('🔧 Force loading customer data...');
   
-  if (window.customer && window.customer.id) {
-    // Create complete user data
-    const completeUserData = {
-      id: window.customer.id,
-      email: window.customer.email,
-      name: (window.customer.first_name + ' ' + window.customer.last_name).trim(),
-      tier: 'pro', // You had pro tier in localStorage
-      isLoggedIn: true,
-      provider: 'shopify',
-      isFactory: false
-    };
-    
-    // Update localStorage
-    localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
-    
-    // Update current user
-    currentUser = { ...currentUser, ...completeUserData };
-    
-    // Update UI
-    updateUserProfile();
-    loadSubscriptionStatus();
-    
-    // Update subscription manager
-    if (window.subscriptionManager) {
-      window.subscriptionManager.customer = window.customer;
-      window.subscriptionManager.currentTier = 'pro';
-      window.subscriptionManager.updateUI();
+  try {
+    // Check if we can access customer data
+    if (window.customer && typeof window.customer === 'object') {
+      console.log('🔍 Customer object found:', window.customer);
+      
+      // Try to access customer properties safely
+      const customerId = window.customer.id || 'unknown';
+      const customerEmail = window.customer.email || 'unknown@example.com';
+      const firstName = window.customer.first_name || '';
+      const lastName = window.customer.last_name || '';
+      const customerName = (firstName + ' ' + lastName).trim() || 'Customer';
+      
+      console.log('📋 Customer details:', { customerId, customerEmail, customerName });
+      
+      // Create complete user data
+      const completeUserData = {
+        id: customerId,
+        email: customerEmail,
+        name: customerName,
+        tier: 'pro', // You had pro tier in localStorage
+        isLoggedIn: true,
+        provider: 'shopify',
+        isFactory: false
+      };
+      
+      // Update localStorage
+      localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
+      
+      // Update current user
+      currentUser = { ...currentUser, ...completeUserData };
+      
+      // Update UI
+      updateUserProfile();
+      loadSubscriptionStatus();
+      
+      // Update subscription manager
+      if (window.subscriptionManager) {
+        window.subscriptionManager.customer = window.customer;
+        window.subscriptionManager.currentTier = 'pro';
+        window.subscriptionManager.updateUI();
+      }
+      
+      showNotification('Customer data force loaded!', 'success');
+      console.log('✅ Customer data force loaded:', completeUserData);
+      
+      // Refresh the page to show changes
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+      
+    } else {
+      console.log('❌ No valid customer object found');
+      showNotification('No customer data available to load', 'error');
     }
-    
-    showNotification('Customer data force loaded!', 'success');
-    console.log('✅ Customer data force loaded:', completeUserData);
-  } else {
-    showNotification('No customer data available to load', 'error');
+  } catch (error) {
+    console.error('❌ Error force loading customer data:', error);
+    showNotification('Error loading customer data: ' + error.message, 'error');
   }
 }
 
