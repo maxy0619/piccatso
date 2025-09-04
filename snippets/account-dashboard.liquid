@@ -843,6 +843,7 @@
         <h4 style="margin-bottom: 1rem; color: #1e293b;">🔧 Debug Tools</h4>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
           <button onclick="testCustomerData()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Test Customer Data</button>
+          <button onclick="forceLoadCustomerData()" class="action-button" style="font-size: 1.2rem; padding: 0.8rem 1.5rem; background: #10b981;">Force Load Customer</button>
           <button onclick="setTestTier('premium')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Premium Tier</button>
           <button onclick="setTestTier('pro')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Pro Tier</button>
           <button onclick="refreshDashboard()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Refresh Dashboard</button>
@@ -1241,6 +1242,8 @@ function loadUserData() {
     currentUser.id = user.id || '';
     currentUser.provider = user.provider || '';
     currentUser.isFactory = user.isFactory || false;
+    
+    console.log('📦 Loaded from localStorage:', user);
   }
   
   if (userDataExtended) {
@@ -1263,6 +1266,31 @@ function loadUserData() {
     currentUser.isLoggedIn = true;
     currentUser.id = customer.id || '';
     currentUser.provider = 'shopify';
+    
+    console.log('🔄 Updated from Shopify customer object:', currentUser);
+  }
+  
+  // If we have customer data but incomplete localStorage, update it
+  if (window.customer && window.customer.id && (!currentUser.email || currentUser.email === 'guest@piccatso.com')) {
+    console.log('🔧 Updating incomplete customer data from window.customer');
+    currentUser.email = window.customer.email || '';
+    currentUser.name = (window.customer.first_name + ' ' + window.customer.last_name).trim() || '';
+    currentUser.isLoggedIn = true;
+    currentUser.id = window.customer.id || '';
+    currentUser.provider = 'shopify';
+    
+    // Update localStorage with complete data
+    const completeUserData = {
+      id: window.customer.id,
+      email: window.customer.email,
+      name: currentUser.name,
+      tier: currentUser.tier,
+      isLoggedIn: true,
+      provider: 'shopify',
+      isFactory: currentUser.tier === 'factory'
+    };
+    localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
+    console.log('💾 Updated localStorage with complete data:', completeUserData);
   }
   
   // Set defaults if no data
@@ -1791,14 +1819,24 @@ function testCustomerData() {
   const output = [];
   
   output.push('=== CUSTOMER DATA DEBUG ===');
-  output.push('window.Shopify:', window.Shopify);
-  output.push('window.customer:', window.customer);
-  output.push('window.subscriptionManager:', window.subscriptionManager);
-  output.push('subscriptionManager.customer:', window.subscriptionManager?.customer);
-  output.push('currentUser:', currentUser);
+  output.push('window.Shopify:', JSON.stringify(window.Shopify, null, 2));
+  output.push('window.customer:', JSON.stringify(window.customer, null, 2));
+  output.push('window.subscriptionManager:', window.subscriptionManager ? 'Available' : 'Not Available');
+  output.push('subscriptionManager.customer:', JSON.stringify(window.subscriptionManager?.customer, null, 2));
+  output.push('currentUser:', JSON.stringify(currentUser, null, 2));
   output.push('localStorage piccatso_user:', localStorage.getItem('piccatso_user'));
   
-  debugOutput.innerHTML = output.map(line => `<div>${line}</div>`).join('');
+  // Also check if customer data is being loaded properly
+  if (window.customer && window.customer.id) {
+    output.push('✅ Customer ID found:', window.customer.id);
+    output.push('✅ Customer email:', window.customer.email);
+    output.push('✅ Customer name:', window.customer.first_name + ' ' + window.customer.last_name);
+    output.push('✅ Customer tags:', window.customer.tags);
+  } else {
+    output.push('❌ No customer data found');
+  }
+  
+  debugOutput.innerHTML = output.map(line => `<div style="margin-bottom: 0.5rem;">${line}</div>`).join('');
 }
 
 function setTestTier(tier) {
@@ -1815,10 +1853,59 @@ function setTestTier(tier) {
 }
 
 function refreshDashboard() {
+  console.log('🔄 Refreshing dashboard...');
   loadUserData();
   updateUserProfile();
   loadSubscriptionStatus();
+  
+  // Force update subscription manager if available
+  if (window.subscriptionManager && window.customer) {
+    window.subscriptionManager.customer = window.customer;
+    window.subscriptionManager.loadCustomerData();
+    window.subscriptionManager.updateUI();
+  }
+  
   showNotification('Dashboard refreshed', 'success');
+}
+
+// Force load customer data function
+function forceLoadCustomerData() {
+  console.log('🔧 Force loading customer data...');
+  
+  if (window.customer && window.customer.id) {
+    // Create complete user data
+    const completeUserData = {
+      id: window.customer.id,
+      email: window.customer.email,
+      name: (window.customer.first_name + ' ' + window.customer.last_name).trim(),
+      tier: 'pro', // You had pro tier in localStorage
+      isLoggedIn: true,
+      provider: 'shopify',
+      isFactory: false
+    };
+    
+    // Update localStorage
+    localStorage.setItem('piccatso_user', JSON.stringify(completeUserData));
+    
+    // Update current user
+    currentUser = { ...currentUser, ...completeUserData };
+    
+    // Update UI
+    updateUserProfile();
+    loadSubscriptionStatus();
+    
+    // Update subscription manager
+    if (window.subscriptionManager) {
+      window.subscriptionManager.customer = window.customer;
+      window.subscriptionManager.currentTier = 'pro';
+      window.subscriptionManager.updateUI();
+    }
+    
+    showNotification('Customer data force loaded!', 'success');
+    console.log('✅ Customer data force loaded:', completeUserData);
+  } else {
+    showNotification('No customer data available to load', 'error');
+  }
 }
 
 // Initialize dashboard when page loads
