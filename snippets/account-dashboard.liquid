@@ -844,6 +844,7 @@
         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
           <button onclick="testCustomerData()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Test Customer Data</button>
           <button onclick="forceLoadCustomerData()" class="action-button" style="font-size: 1.2rem; padding: 0.8rem 1.5rem; background: #10b981;">Force Load Customer</button>
+          <button onclick="inspectCustomerObject()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Inspect Customer</button>
           <button onclick="setTestTier('premium')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Premium Tier</button>
           <button onclick="setTestTier('pro')" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Set Pro Tier</button>
           <button onclick="refreshDashboard()" class="action-button secondary" style="font-size: 1.2rem; padding: 0.8rem 1.5rem;">Refresh Dashboard</button>
@@ -1894,6 +1895,47 @@ function refreshDashboard() {
   }
   
   showNotification('Dashboard refreshed', 'success');
+}
+
+// Inspect customer object function
+function inspectCustomerObject() {
+  const debugOutput = document.getElementById('debug-output');
+  const output = [];
+  
+  output.push('=== CUSTOMER OBJECT INSPECTION ===');
+  
+  if (window.customer && typeof window.customer === 'object') {
+    output.push('✅ Customer object exists');
+    
+    // Try to access all possible properties
+    const properties = ['id', 'email', 'first_name', 'last_name', 'name', 'tags', 'created_at', 'updated_at'];
+    
+    properties.forEach(prop => {
+      try {
+        const value = window.customer[prop];
+        if (value !== undefined && value !== null) {
+          output.push(`✅ ${prop}: ${value}`);
+        } else {
+          output.push(`❌ ${prop}: undefined/null`);
+        }
+      } catch (e) {
+        output.push(`❌ ${prop}: Error - ${e.message}`);
+      }
+    });
+    
+    // Try to get all enumerable properties
+    try {
+      const allProps = Object.keys(window.customer);
+      output.push('📋 All properties:', allProps.join(', '));
+    } catch (e) {
+      output.push('❌ Cannot enumerate properties:', e.message);
+    }
+    
+  } else {
+    output.push('❌ No customer object found');
+  }
+  
+  debugOutput.innerHTML = output.map(line => `<div style="margin-bottom: 0.5rem;">${line}</div>`).join('');
 }
 
 // Force load customer data function
