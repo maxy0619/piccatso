@@ -539,14 +539,17 @@ async function checkShopifyCustomerStatus() {
         
         // User is logged into Shopify - sync with local system
         const userData = {
-          id: customer.id, // Use actual customer ID, not prefixed
+          id: customer.id,
           email: customer.email,
           name: (customer.first_name + ' ' + customer.last_name).trim(),
-          tier: 'free', // Default tier
+          tier: 'free', // Default tier for all new accounts
           isLoggedIn: true,
-          loginTime: new Date().toISOString(),
-          loginMethod: 'shopify',
-          shopifyCustomerId: customer.id
+          provider: 'shopify',
+          generationsUsed: 0,
+          generationsLimit: 10,
+          artworks: [],
+          cartItems: [],
+          orders: []
         };
         
         console.log('💾 Storing user data:', userData);

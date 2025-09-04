@@ -388,14 +388,19 @@
             
             // Update with Shopify customer data
             const updatedUser = {
-              ...currentUser,
               id: window.customer.id,
               email: window.customer.email || currentUser.email,
               name: window.customer.first_name && window.customer.last_name 
                 ? `${window.customer.first_name} ${window.customer.last_name}`
-                : currentUser.name,
+                : 'Customer',
+              tier: currentUser.tier || 'free', // Default to free tier
               isLoggedIn: true,
-              provider: 'shopify'
+              provider: 'shopify',
+              generationsUsed: currentUser.generationsUsed || 0,
+              generationsLimit: currentUser.generationsLimit || 10,
+              artworks: currentUser.artworks || [],
+              cartItems: currentUser.cartItems || [],
+              orders: currentUser.orders || []
             };
             
             // Save to localStorage

@@ -1908,8 +1908,8 @@ function inspectCustomerObject() {
   if (window.customer && typeof window.customer === 'object') {
     output.push('✅ Customer object exists');
     
-    // Try to access all possible properties
-    const properties = ['id', 'email', 'first_name', 'last_name', 'name', 'tags', 'created_at', 'updated_at', 'customer_id', 'email_address', 'firstName', 'lastName'];
+    // Try to access all possible properties (only necessary ones)
+    const properties = ['id', 'email', 'first_name', 'last_name', 'tags'];
     
     properties.forEach(prop => {
       try {
@@ -1970,10 +1970,10 @@ function manualCustomerFix() {
   let customerName = 'Customer User';
   
   if (window.customer && typeof window.customer === 'object') {
-    // Try different property names
-    const possibleIdProps = ['id', 'customer_id', 'customerId', 'ID'];
-    const possibleEmailProps = ['email', 'email_address', 'emailAddress', 'Email'];
-    const possibleNameProps = ['name', 'full_name', 'fullName', 'display_name'];
+    // Try different property names (only necessary ones)
+    const possibleIdProps = ['id'];
+    const possibleEmailProps = ['email'];
+    const possibleNameProps = ['first_name', 'last_name'];
     
     // Try to find ID
     for (const prop of possibleIdProps) {
@@ -1991,20 +1991,10 @@ function manualCustomerFix() {
       }
     }
     
-    // Try to find name
-    for (const prop of possibleNameProps) {
-      if (window.customer[prop]) {
-        customerName = window.customer[prop];
-        break;
-      }
-    }
-    
-    // If no name found, try to construct from first/last name
-    if (customerName === 'Customer User') {
-      const firstName = window.customer.first_name || window.customer.firstName || 'Customer';
-      const lastName = window.customer.last_name || window.customer.lastName || 'User';
-      customerName = `${firstName} ${lastName}`.trim();
-    }
+    // Construct name from first and last name
+    const firstName = window.customer.first_name || 'Customer';
+    const lastName = window.customer.last_name || 'User';
+    customerName = `${firstName} ${lastName}`.trim();
   }
   
   // Create the fixed user data
@@ -2012,10 +2002,9 @@ function manualCustomerFix() {
     id: customerId,
     email: customerEmail,
     name: customerName,
-    tier: 'pro', // You had pro tier in localStorage
+    tier: 'free', // Default tier for new accounts
     isLoggedIn: true,
     provider: 'shopify',
-    isFactory: false,
     generationsUsed: 0,
     generationsLimit: 10,
     artworks: [],
