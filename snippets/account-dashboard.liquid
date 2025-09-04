@@ -1110,7 +1110,7 @@
       <h3 style="margin-bottom: 1.5rem; color: #1e293b;">Available Plans</h3>
       
       <!-- Free Tier -->
-      <div class="subscription-plan" data-plan="free" data-action="downgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('free', 'downgrade')">
+      <div class="subscription-plan" data-plan="free" data-action="downgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='#f59e0b'; this.style.backgroundColor='#fffbeb';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='transparent';">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h4 style="margin: 0; color: #64748b;">🆓 Free Tier</h4>
           <span style="font-size: 1.2rem; font-weight: bold; color: #64748b;">$0/month</span>
@@ -1121,10 +1121,11 @@
           <li>Watermarked downloads</li>
           <li>Community support</li>
         </ul>
+        <div style="position: absolute; top: 1rem; right: 1rem; background: #f59e0b; color: white; padding: 0.3rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 600;">Click to Select</div>
       </div>
       
       <!-- Premium Tier -->
-      <div class="subscription-plan" data-plan="premium" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('premium', 'upgrade')">
+      <div class="subscription-plan" data-plan="premium" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='#8B5CF6'; this.style.backgroundColor='#f3f0ff';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='transparent';">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h4 style="margin: 0; color: #8B5CF6;">⭐ Premium Tier</h4>
           <span style="font-size: 1.2rem; font-weight: bold; color: #8B5CF6;">$9.99/month</span>
@@ -1136,10 +1137,11 @@
           <li>Favorites collection</li>
           <li>Email support (48hr response)</li>
         </ul>
+        <div style="position: absolute; top: 1rem; right: 1rem; background: #8B5CF6; color: white; padding: 0.3rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 600;">Click to Select</div>
       </div>
       
       <!-- Pro Tier -->
-      <div class="subscription-plan" data-plan="pro" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('pro', 'upgrade')">
+      <div class="subscription-plan" data-plan="pro" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='#10b981'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='transparent';">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
           <h4 style="margin: 0; color: #10b981;">🎨 Pro Tier</h4>
           <span style="font-size: 1.2rem; font-weight: bold; color: #10b981;">$39.99/month</span>
@@ -1152,6 +1154,7 @@
           <li>Priority support</li>
           <li>10% discount on prints</li>
         </ul>
+        <div style="position: absolute; top: 1rem; right: 1rem; background: #10b981; color: white; padding: 0.3rem 0.6rem; border-radius: 0.3rem; font-size: 0.8rem; font-weight: 600;">Click to Select</div>
       </div>
     </div>
     
@@ -1572,6 +1575,31 @@ function showSubscriptionModal() {
   } else {
     console.error('❌ Could not find subscription-actions element');
   }
+  
+  // Add event listeners to subscription plans
+  setTimeout(() => {
+    const plans = document.querySelectorAll('.subscription-plan');
+    console.log('🎯 Adding event listeners to', plans.length, 'plans');
+    
+    plans.forEach(plan => {
+      // Remove any existing event listeners
+      plan.removeEventListener('click', handlePlanClick);
+      
+      // Add new event listener
+      plan.addEventListener('click', handlePlanClick);
+      console.log('✅ Event listener added to plan:', plan.dataset.plan);
+    });
+  }, 100);
+}
+
+function handlePlanClick(event) {
+  const plan = event.currentTarget;
+  const planType = plan.dataset.plan;
+  const action = plan.dataset.action;
+  
+  console.log('🎯 Plan clicked:', planType, action);
+  
+  selectSubscriptionPlan(planType, action);
 }
 
 function closeSubscriptionModal() {

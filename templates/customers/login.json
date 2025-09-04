@@ -1,10 +1,13 @@
 {
   "sections": {
-    "main": {
-      "type": "main-login"
+    "redirect": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "<script>window.location.href = '/pages/auth';</script>"
+      }
     }
   },
   "order": [
-    "main"
+    "redirect"
   ]
 }
