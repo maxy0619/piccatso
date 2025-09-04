@@ -296,6 +296,7 @@
 </div>
 
 <script>
+console.log('🎯 Auth forms script loaded!');
 let currentTab = 'signin';
 
 function switchTab(tab) {
@@ -360,48 +361,55 @@ async function handleSignIn(event) {
 }
 
 async function handleSignUp(event) {
-  event.preventDefault();
-  clearMessages();
-  
-  const name = document.getElementById('signup-name').value;
-  const email = document.getElementById('signup-email').value;
-  const password = document.getElementById('signup-password').value;
-  const confirmPassword = document.getElementById('signup-confirm').value;
-  
-  console.log('📝 Attempting sign up with:', { 
-    name, 
-    email, 
-    password: password ? '***' : 'empty',
-    confirmPassword: confirmPassword ? '***' : 'empty'
-  });
-  
-  // Validate passwords match
-  if (password !== confirmPassword) {
-    showError('signup', 'Passwords do not match.');
-    return;
-  }
-  
-  // Validate password strength
-  if (password.length < 8) {
-    showError('signup', 'Password must be at least 8 characters long.');
-    return;
-  }
-  
   try {
-    showSuccess('signup', 'Redirecting to Shopify account creation...');
+    console.log('🎯 handleSignUp function called');
+    event.preventDefault();
+    clearMessages();
     
-    // Simply redirect to Shopify's account creation page
-    // Let Shopify handle all the CAPTCHA and form validation
-    console.log('🔄 Redirecting to:', '/account');
+    const name = document.getElementById('signup-name').value;
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const confirmPassword = document.getElementById('signup-confirm').value;
     
-    // Add a small delay so we can see our logs
-    setTimeout(() => {
-      window.location.href = '/account';
-    }, 1000);
+    console.log('📝 Attempting sign up with:', { 
+      name, 
+      email, 
+      password: password ? '***' : 'empty',
+      confirmPassword: confirmPassword ? '***' : 'empty'
+    });
     
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      showError('signup', 'Passwords do not match.');
+      return;
+    }
+    
+    // Validate password strength
+    if (password.length < 8) {
+      showError('signup', 'Password must be at least 8 characters long.');
+      return;
+    }
+    
+    try {
+      showSuccess('signup', 'Redirecting to Shopify account creation...');
+      
+      // Simply redirect to Shopify's account creation page
+      // Let Shopify handle all the CAPTCHA and form validation
+      console.log('🔄 Redirecting to:', '/account');
+      
+      // Add a small delay so we can see our logs
+      setTimeout(() => {
+        console.log('⏰ Timeout completed, redirecting now...');
+        window.location.href = '/account';
+      }, 1000);
+      
+    } catch (error) {
+      console.error('❌ Sign up error:', error);
+      showError('signup', 'Error redirecting to account creation. Please try again.');
+    }
   } catch (error) {
-    console.error('❌ Sign up error:', error);
-    showError('signup', 'Error redirecting to account creation. Please try again.');
+    console.error('❌ Fatal error in handleSignUp:', error);
+    showError('signup', 'A critical error occurred. Please try again.');
   }
 }
 
@@ -494,51 +502,56 @@ function forceLogout() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-  console.log('🚀 Page loaded, current URL:', window.location.href);
-  console.log('📄 Current page path:', window.location.pathname);
-  
-  // Check URL for logout parameter
-  const urlParams = new URLSearchParams(window.location.search);
-  const isLogout = urlParams.get('logout') === 'true';
-  
-  if (isLogout) {
-    console.log('🚪 Logout parameter detected');
-    // User wants to log out - clear data and show logout message
-    localStorage.removeItem('piccatso_user');
-    localStorage.removeItem('piccatso_user_data');
-    sessionStorage.clear();
+  try {
+    console.log('🚀 Page loaded, current URL:', window.location.href);
+    console.log('📄 Current page path:', window.location.pathname);
     
-    // Remove Factory banner if present
-    const banner = document.getElementById('factory-mode-banner');
-    if (banner) {
-      banner.remove();
-      document.body.style.paddingTop = '';
+    // Check URL for logout parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const isLogout = urlParams.get('logout') === 'true';
+    
+    if (isLogout) {
+      console.log('🚪 Logout parameter detected');
+      // User wants to log out - clear data and show logout message
+      localStorage.removeItem('piccatso_user');
+      localStorage.removeItem('piccatso_user_data');
+      sessionStorage.clear();
+      
+      // Remove Factory banner if present
+      const banner = document.getElementById('factory-mode-banner');
+      if (banner) {
+        banner.remove();
+        document.body.style.paddingTop = '';
+      }
+      
+      // Update header
+      window.dispatchEvent(new Event('piccatso-auth-change'));
+      if (window.refreshAuthButton) {
+        window.refreshAuthButton();
+      }
+      
+      showSuccess('signin', 'You have been logged out successfully.');
+      
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+      return;
     }
     
-    // Update header
-    window.dispatchEvent(new Event('piccatso-auth-change'));
-    if (window.refreshAuthButton) {
-      window.refreshAuthButton();
+    // Check for Shopify customer account success (if redirected from account creation)
+    const shopifySuccess = urlParams.get('shopify_success') === 'true';
+    if (shopifySuccess) {
+      console.log('✅ Shopify success parameter detected');
+      showSuccess('signin', 'Account created successfully! You can now sign in with your email and password.');
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
     
-    showSuccess('signin', 'You have been logged out successfully.');
+    // Check if user is already logged in via Shopify or local storage
+    checkShopifyCustomerStatus();
     
-    // Clean URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-    return;
+  } catch (error) {
+    console.error('❌ Error in DOMContentLoaded:', error);
   }
-  
-  // Check for Shopify customer account success (if redirected from account creation)
-  const shopifySuccess = urlParams.get('shopify_success') === 'true';
-  if (shopifySuccess) {
-    console.log('✅ Shopify success parameter detected');
-    showSuccess('signin', 'Account created successfully! You can now sign in with your email and password.');
-    // Clean URL
-    window.history.replaceState({}, document.title, window.location.pathname);
-  }
-  
-  // Check if user is already logged in via Shopify or local storage
-  checkShopifyCustomerStatus();
 });
 
 // Function to check if user is logged into Shopify
