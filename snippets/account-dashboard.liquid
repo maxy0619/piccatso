@@ -822,9 +822,9 @@
       </div>
       
       <div style="margin-top: 2rem; display: flex; gap: 1rem;">
-        <button onclick="showSubscriptionModal()" class="action-button" style="flex: 1; background: #10b981; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+        <a href="/pages/subscription" class="action-button" style="flex: 1; background: #10b981; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; text-decoration: none; text-align: center; display: block;">
           Manage Subscription
-        </button>
+        </a>
         <button onclick="manageBilling()" class="action-button secondary" style="flex: 1; background: #64748b; color: white; padding: 1rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
           Billing
         </button>
@@ -1453,9 +1453,9 @@ function loadArtworkCollection() {
       <div class="empty-state">
         <div class="empty-state-icon">🔒</div>
         <p>Artwork history is not available on the Free tier.<br>Upgrade to Premium to save your creations!</p>
-        <button class="action-button" onclick="showSubscriptionModal()">
+        <a href="/pages/subscription" class="action-button" style="text-decoration: none; text-align: center; display: block;">
           Manage Subscription
-        </button>
+        </a>
       </div>
     `;
     return;

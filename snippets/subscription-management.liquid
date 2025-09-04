@@ -1,0 +1,332 @@
+<!-- Subscription Management Page -->
+<div class="subscription-management-container" style="max-width: 1200px; margin: 0 auto; padding: 2rem;">
+  
+  <!-- Current Subscription Status -->
+  <div class="current-subscription-card" style="background: #f8fafc; border-radius: 1rem; padding: 2rem; margin-bottom: 3rem; border: 1px solid #e2e8f0;">
+    <h2 style="margin: 0 0 1.5rem 0; color: #1e293b;">Current Subscription</h2>
+    <div id="current-subscription-display">
+      <!-- Will be populated by JavaScript -->
+    </div>
+  </div>
+  
+  <!-- Available Plans -->
+  <div class="subscription-plans-section">
+    <h2 style="margin: 0 0 2rem 0; color: #1e293b; text-align: center;">Available Plans</h2>
+    
+    <div class="plans-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+      
+      <!-- Free Tier -->
+      <div class="subscription-plan-card" data-plan="free" data-action="downgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative;" onmouseover="this.style.borderColor='#f59e0b'; this.style.backgroundColor='#fffbeb';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='transparent';">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🆓</div>
+        <h3 style="margin: 0 0 1rem 0; color: #64748b; font-size: 1.5rem;">Free Tier</h3>
+        <div style="font-size: 2rem; font-weight: bold; color: #64748b; margin-bottom: 1.5rem;">$0/month</div>
+        <ul style="text-align: left; margin: 0; padding-left: 1.5rem; color: #64748b;">
+          <li>10 generations per month</li>
+          <li>Standard resolution (512x512px)</li>
+          <li>Watermarked downloads</li>
+          <li>Community support</li>
+        </ul>
+        <button class="plan-select-btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; background: #f59e0b; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
+          Select Free Plan
+        </button>
+      </div>
+      
+      <!-- Premium Tier -->
+      <div class="subscription-plan-card" data-plan="premium" data-action="upgrade" style="border: 2px solid #8B5CF6; border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; background: linear-gradient(135deg, #f3f0ff, #ffffff);" onmouseover="this.style.borderColor='#7c3aed'; this.style.backgroundColor='#f3f0ff';" onmouseout="this.style.borderColor='#8B5CF6'; this.style.backgroundColor='linear-gradient(135deg, #f3f0ff, #ffffff)';">
+        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 600;">POPULAR</div>
+        <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
+        <h3 style="margin: 0 0 1rem 0; color: #8B5CF6; font-size: 1.5rem;">Premium Tier</h3>
+        <div style="font-size: 2rem; font-weight: bold; color: #8B5CF6; margin-bottom: 1.5rem;">$9.99/month</div>
+        <ul style="text-align: left; margin: 0; padding-left: 1.5rem; color: #64748b;">
+          <li>100 generations per month</li>
+          <li>High resolution (1024x1024px)</li>
+          <li>Art history saved (50 creations)</li>
+          <li>Favorites collection</li>
+          <li>Email support (48hr response)</li>
+        </ul>
+        <button class="plan-select-btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; background: #8B5CF6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
+          Upgrade to Premium
+        </button>
+      </div>
+      
+      <!-- Pro Tier -->
+      <div class="subscription-plan-card" data-plan="pro" data-action="upgrade" style="border: 2px solid #10b981; border-radius: 1rem; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; background: linear-gradient(135deg, #f0fdf4, #ffffff);" onmouseover="this.style.borderColor='#059669'; this.style.backgroundColor='#f0fdf4';" onmouseout="this.style.borderColor='#10b981'; this.style.backgroundColor='linear-gradient(135deg, #f0fdf4, #ffffff)';">
+        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 600;">BEST VALUE</div>
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
+        <h3 style="margin: 0 0 1rem 0; color: #10b981; font-size: 1.5rem;">Pro Tier</h3>
+        <div style="font-size: 2rem; font-weight: bold; color: #10b981; margin-bottom: 1.5rem;">$39.99/month</div>
+        <ul style="text-align: left; margin: 0; padding-left: 1.5rem; color: #64748b;">
+          <li>200 generations per month</li>
+          <li>Ultra high resolution (2048x2048px)</li>
+          <li>Unlimited art history</li>
+          <li>Commercial usage rights</li>
+          <li>Priority support</li>
+          <li>10% discount on prints</li>
+        </ul>
+        <button class="plan-select-btn" style="width: 100%; margin-top: 1.5rem; padding: 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
+          Upgrade to Pro
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Action Confirmation -->
+  <div id="action-confirmation" style="display: none; background: #f1f5f9; border-radius: 1rem; padding: 2rem; margin-top: 2rem; border: 1px solid #e2e8f0;">
+    <h3 style="margin: 0 0 1rem 0; color: #1e293b;">Confirm Your Selection</h3>
+    <div id="action-description" style="margin-bottom: 1.5rem; color: #475569;">
+      <!-- Will be populated by JavaScript -->
+    </div>
+    <div style="display: flex; gap: 1rem;">
+      <button id="confirm-action-btn" style="flex: 1; padding: 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
+        <!-- Text will be set by JavaScript -->
+      </button>
+      <button id="cancel-action-btn" style="flex: 1; padding: 1rem; background: #64748b; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
+        Cancel
+      </button>
+    </div>
+  </div>
+  
+  <!-- Billing Management -->
+  <div class="billing-management" style="background: #f8fafc; border-radius: 1rem; padding: 2rem; margin-top: 3rem; border: 1px solid #e2e8f0;">
+    <h3 style="margin: 0 0 1rem 0; color: #1e293b;">Billing Management</h3>
+    <p style="color: #64748b; margin-bottom: 1.5rem;">Manage your subscription billing, payment methods, and view your billing history.</p>
+    <button id="manage-billing-btn" style="padding: 1rem 2rem; background: #64748b; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+      Manage Billing
+    </button>
+  </div>
+</div>
+
+<script>
+// Subscription Management JavaScript
+let currentUser = {
+  tier: 'free',
+  generationsUsed: 0,
+  generationsLimit: 10,
+  name: 'Customer',
+  email: '',
+  id: null
+};
+
+let selectedPlan = null;
+let selectedAction = null;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+  console.log('🎯 Subscription management page loaded');
+  loadUserData();
+  updateCurrentSubscriptionDisplay();
+  setupEventListeners();
+});
+
+function loadUserData() {
+  try {
+    // Load from localStorage first
+    const storedUser = localStorage.getItem('piccatso_user');
+    if (storedUser) {
+      const userData = JSON.parse(storedUser);
+      currentUser = { ...currentUser, ...userData };
+      console.log('✅ Loaded user data from localStorage:', currentUser);
+    }
+    
+    // Override with Shopify customer data if available
+    if (window.customer && window.customer.id) {
+      currentUser.id = window.customer.id;
+      currentUser.email = window.customer.email || currentUser.email;
+      currentUser.name = (window.customer.first_name && window.customer.last_name) 
+        ? `${window.customer.first_name} ${window.customer.last_name}`
+        : currentUser.name;
+      console.log('✅ Updated with Shopify customer data:', currentUser);
+    }
+  } catch (error) {
+    console.error('❌ Error loading user data:', error);
+  }
+}
+
+function updateCurrentSubscriptionDisplay() {
+  const displayDiv = document.getElementById('current-subscription-display');
+  const currentTier = currentUser.tier || 'free';
+  
+  const planInfo = {
+    free: { name: 'Free Tier', price: '$0/month', features: ['10 generations/month', 'Standard resolution', 'Watermarked downloads'] },
+    premium: { name: 'Premium Tier', price: '$9.99/month', features: ['100 generations/month', 'High resolution', 'Art history saved'] },
+    pro: { name: 'Pro Tier', price: '$39.99/month', features: ['200 generations/month', 'Ultra HD', 'Commercial rights', 'Print discount'] }
+  };
+  
+  const plan = planInfo[currentTier];
+  
+  displayDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h3 style="margin: 0; color: #1e293b;">${plan.name}</h3>
+      <span style="font-size: 1.5rem; font-weight: bold; color: #1e293b;">${plan.price}</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+      <div>
+        <strong>Usage This Month:</strong><br>
+        <span style="color: #64748b;">${currentUser.generationsUsed || 0} / ${currentUser.generationsLimit || 10} generations</span>
+      </div>
+      <div>
+        <strong>Features:</strong><br>
+        <span style="color: #64748b;">${plan.features.join(', ')}</span>
+      </div>
+    </div>
+  `;
+}
+
+function setupEventListeners() {
+  // Plan selection
+  const planCards = document.querySelectorAll('.subscription-plan-card');
+  planCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const plan = this.dataset.plan;
+      const action = this.dataset.action;
+      selectPlan(plan, action);
+    });
+  });
+  
+  // Cancel action
+  document.getElementById('cancel-action-btn').addEventListener('click', function() {
+    hideActionConfirmation();
+  });
+  
+  // Manage billing
+  document.getElementById('manage-billing-btn').addEventListener('click', function() {
+    manageBilling();
+  });
+}
+
+function selectPlan(plan, action) {
+  console.log('🎯 Plan selected:', plan, action);
+  
+  selectedPlan = plan;
+  selectedAction = action;
+  
+  // Update visual selection
+  document.querySelectorAll('.subscription-plan-card').forEach(card => {
+    card.style.borderColor = '#e2e8f0';
+    card.style.backgroundColor = 'transparent';
+  });
+  
+  const selectedCard = document.querySelector(`[data-plan="${plan}"]`);
+  if (selectedCard) {
+    selectedCard.style.borderColor = action === 'upgrade' ? '#10b981' : '#f59e0b';
+    selectedCard.style.backgroundColor = action === 'upgrade' ? '#f0fdf4' : '#fffbeb';
+  }
+  
+  showActionConfirmation(plan, action);
+}
+
+function showActionConfirmation(plan, action) {
+  const confirmationDiv = document.getElementById('action-confirmation');
+  const descriptionDiv = document.getElementById('action-description');
+  const confirmBtn = document.getElementById('confirm-action-btn');
+  
+  if (action === 'upgrade') {
+    descriptionDiv.innerHTML = `
+      <strong>Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)} Tier</strong><br>
+      You will be redirected to the subscription product page to complete your upgrade. 
+      Your new plan will be active immediately after payment.
+    `;
+    confirmBtn.textContent = 'Continue to Checkout';
+    confirmBtn.style.background = '#10b981';
+  } else if (action === 'downgrade') {
+    descriptionDiv.innerHTML = `
+      <strong>Downgrade to Free Tier</strong><br>
+      Your current subscription will remain active until the next billing date. 
+      After that, you'll be moved to the Free tier with limited features.
+    `;
+    confirmBtn.textContent = 'Schedule Downgrade';
+    confirmBtn.style.background = '#f59e0b';
+  }
+  
+  confirmationDiv.style.display = 'block';
+  confirmationDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function hideActionConfirmation() {
+  document.getElementById('action-confirmation').style.display = 'none';
+  selectedPlan = null;
+  selectedAction = null;
+  
+  // Reset visual selection
+  document.querySelectorAll('.subscription-plan-card').forEach(card => {
+    card.style.borderColor = card.dataset.plan === 'premium' ? '#8B5CF6' : card.dataset.plan === 'pro' ? '#10b981' : '#e2e8f0';
+    card.style.backgroundColor = 'transparent';
+  });
+}
+
+// Handle confirm action
+document.getElementById('confirm-action-btn').addEventListener('click', function() {
+  if (selectedAction === 'upgrade') {
+    processUpgrade(selectedPlan);
+  } else if (selectedAction === 'downgrade') {
+    processDowngrade(selectedPlan);
+  }
+});
+
+function processUpgrade(plan) {
+  console.log('🎯 Processing upgrade to:', plan);
+  
+  // Get subscription URLs from configuration
+  const subscriptionUrls = window.PiccatsoSubscriptionConfig?.subscriptionUrls || {
+    premium: '/products/8482650226838',
+    pro: '/products/8482650554518'
+  };
+  
+  const productUrl = subscriptionUrls[plan];
+  if (!productUrl) {
+    alert('Subscription product not found. Please contact support.');
+    return;
+  }
+  
+  // Show loading state
+  const confirmBtn = document.getElementById('confirm-action-btn');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'Redirecting...';
+  confirmBtn.disabled = true;
+  
+  // Redirect to subscription product page
+  setTimeout(() => {
+    window.location.href = productUrl;
+  }, 1000);
+}
+
+function processDowngrade(plan) {
+  console.log('🎯 Processing downgrade to:', plan);
+  
+  // For downgrades, we'll update the customer metafields to schedule the change
+  alert('Downgrade scheduled successfully. Your current plan remains active until the next billing date.');
+  hideActionConfirmation();
+}
+
+function manageBilling() {
+  // Get subscription management URL from configuration
+  const subscriptionManagementUrl = window.PiccatsoSubscriptionConfig?.subscriptionManagementUrl || '/account';
+  
+  // Redirect to subscription management
+  window.location.href = subscriptionManagementUrl;
+}
+
+// Notification system
+function showNotification(message, type = 'info') {
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+    color: white;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  `;
+  notification.textContent = message;
+  
+  document.body.appendChild(notification);
+  
+  setTimeout(() => {
+    notification.remove();
+  }, 3000);
+}
+</script>

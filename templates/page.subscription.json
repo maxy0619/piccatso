@@ -6,14 +6,14 @@
         "heading": {
           "type": "heading",
           "settings": {
-            "heading": "Choose Your Piccatso Plan",
+            "heading": "Manage Your Subscription",
             "heading_size": "h1"
           }
         },
         "text": {
           "type": "text",
           "settings": {
-            "text": "<p>Unlock the full potential of AI art creation with our subscription plans designed for every creator.</p>"
+            "text": "<p>Choose the perfect plan for your AI art creation needs. Upgrade or downgrade your subscription anytime.</p>"
           }
         }
       },
@@ -30,15 +30,22 @@
         "padding_bottom": 20
       }
     },
-    "subscription_plans": {
+    "customer_data_script": {
       "type": "custom-liquid",
       "settings": {
-        "custom_liquid": "{% render 'subscription-plans' %}"
+        "custom_liquid": "<script>{% if customer %}window.customer = { id: {{ customer.id | json }}, email: {{ customer.email | json }}, first_name: {{ customer.first_name | json }}, last_name: {{ customer.last_name | json }}, tags: {{ customer.tags | json }} };{% else %}window.customer = null;{% endif %} console.log('🔍 Customer data loaded:', window.customer);</script>"
+      }
+    },
+    "subscription_management": {
+      "type": "custom-liquid",
+      "settings": {
+        "custom_liquid": "{% if customer %}{% render 'subscription-management' %}{% else %}<div style='text-align: center; padding: 4rem 2rem;'><h2>🔐 Authentication Required</h2><p>You need to be logged in to manage your subscription.</p><a href='/pages/auth' class='button button--primary' style='margin-top: 1rem;'>Sign In</a></div>{% endif %}"
       }
     }
   },
   "order": [
     "subscription_hero",
-    "subscription_plans"
+    "customer_data_script",
+    "subscription_management"
   ]
 }
