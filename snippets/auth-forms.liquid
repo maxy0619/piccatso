@@ -209,34 +209,35 @@
     <button class="auth-tab" onclick="switchTab('signup')">Sign Up</button>
   </div>
 
-  <!-- Sign In Form -->
+    <!-- Sign In Form -->
   <div class="auth-form active" id="signin-form">
     <div class="error-message" id="signin-error"></div>
     <div class="success-message" id="signin-success"></div>
     
-         <!-- Shopify Native Customer Account Sign In -->
-     <div class="shopify-auth-info">
-       <p style="text-align: center; color: #64748b; margin-bottom: 1rem;">
-         Sign in with your Shopify customer account
-       </p>
-     </div>
+    <!-- Shopify Native Customer Account Sign In -->
+    <div class="shopify-auth-info">
+      <p style="text-align: center; color: #64748b; margin-bottom: 1rem;">
+        Sign in with your Shopify customer account
+      </p>
+    </div>
     
-    <form onsubmit="handleSignIn(event)">
+    <!-- Use Shopify's native customer login form -->
+    {% form 'customer_login' %}
       <div class="form-group">
-        <label class="form-label" for="signin-email">Email Address</label>
-        <input type="email" id="signin-email" class="form-input" placeholder="your@email.com" required>
+        <label class="form-label" for="CustomerEmail">Email Address</label>
+        <input type="email" name="customer[email]" id="CustomerEmail" class="form-input" placeholder="your@email.com" required>
       </div>
       
       <div class="form-group">
-        <label class="form-label" for="signin-password">Password</label>
-        <input type="password" id="signin-password" class="form-input" placeholder="Enter your password" required>
+        <label class="form-label" for="CustomerPassword">Password</label>
+        <input type="password" name="customer[password]" id="CustomerPassword" class="form-input" placeholder="Enter your password" required>
       </div>
       
       <button type="submit" class="form-button">Sign In</button>
-    </form>
+    {% endform %}
     
     <div class="forgot-password">
-      <a href="#" onclick="showForgotPassword()">Forgot your password?</a>
+      <a href="/account/recover">Forgot your password?</a>
     </div>
   </div>
 
@@ -252,29 +253,30 @@
       </p>
     </div>
     
-    <form onsubmit="handleSignUp(event)">
+    <!-- Use Shopify's native customer registration form -->
+    {% form 'create_customer' %}
       <div class="form-group">
-        <label class="form-label" for="signup-name">Full Name</label>
-        <input type="text" id="signup-name" class="form-input" placeholder="John Doe" required>
+        <label class="form-label" for="FirstName">First Name</label>
+        <input type="text" name="customer[first_name]" id="FirstName" class="form-input" placeholder="John" required>
       </div>
       
       <div class="form-group">
-        <label class="form-label" for="signup-email">Email Address</label>
-        <input type="email" id="signup-email" class="form-input" placeholder="your@email.com" required>
+        <label class="form-label" for="LastName">Last Name</label>
+        <input type="text" name="customer[last_name]" id="LastName" class="form-input" placeholder="Doe" required>
       </div>
       
       <div class="form-group">
-        <label class="form-label" for="signup-password">Password</label>
-        <input type="password" id="signup-password" class="form-input" placeholder="Create a strong password" required minlength="8">
+        <label class="form-label" for="Email">Email Address</label>
+        <input type="email" name="customer[email]" id="Email" class="form-input" placeholder="your@email.com" required>
       </div>
       
       <div class="form-group">
-        <label class="form-label" for="signup-confirm">Confirm Password</label>
-        <input type="password" id="signup-confirm" class="form-input" placeholder="Confirm your password" required minlength="8">
+        <label class="form-label" for="CreatePassword">Password</label>
+        <input type="password" name="customer[password]" id="CreatePassword" class="form-input" placeholder="Create a strong password" required minlength="8">
       </div>
       
       <button type="submit" class="form-button">Create Account</button>
-    </form>
+    {% endform %}
   </div>
 
   <!-- Logout Option (if logged in) -->
@@ -337,81 +339,11 @@ function showSuccess(formType, message) {
   successEl.style.display = 'block';
 }
 
-async function handleSignIn(event) {
-  event.preventDefault();
-  clearMessages();
-  
-  const email = document.getElementById('signin-email').value;
-  const password = document.getElementById('signin-password').value;
-  
-  console.log('🔐 Attempting sign in with:', { email, password: password ? '***' : 'empty' });
-  
-  try {
-    showSuccess('signin', 'Redirecting to Shopify sign in...');
-    
-    // Simply redirect to Shopify's login page
-    // Let Shopify handle all the CAPTCHA and form validation
-    console.log('🔄 Redirecting to:', '/account/login');
-    window.location.href = '/account/login';
-    
-  } catch (error) {
-    console.error('❌ Sign in error:', error);
-    showError('signin', 'Error redirecting to sign in. Please try again.');
-  }
-}
+// This function is no longer needed since we're using Shopify's native forms
+// Shopify handles all authentication, CAPTCHA, and validation automatically
 
-async function handleSignUp(event) {
-  try {
-    console.log('🎯 handleSignUp function called');
-    event.preventDefault();
-    clearMessages();
-    
-    const name = document.getElementById('signup-name').value;
-    const email = document.getElementById('signup-email').value;
-    const password = document.getElementById('signup-password').value;
-    const confirmPassword = document.getElementById('signup-confirm').value;
-    
-    console.log('📝 Attempting sign up with:', { 
-      name, 
-      email, 
-      password: password ? '***' : 'empty',
-      confirmPassword: confirmPassword ? '***' : 'empty'
-    });
-    
-    // Validate passwords match
-    if (password !== confirmPassword) {
-      showError('signup', 'Passwords do not match.');
-      return;
-    }
-    
-    // Validate password strength
-    if (password.length < 8) {
-      showError('signup', 'Password must be at least 8 characters long.');
-      return;
-    }
-    
-    try {
-      showSuccess('signup', 'Redirecting to Shopify account creation...');
-      
-      // Simply redirect to Shopify's account creation page
-      // Let Shopify handle all the CAPTCHA and form validation
-      console.log('🔄 Redirecting to:', '/account');
-      
-      // Add a small delay so we can see our logs
-      setTimeout(() => {
-        console.log('⏰ Timeout completed, redirecting now...');
-        window.location.href = '/account';
-      }, 1000);
-      
-    } catch (error) {
-      console.error('❌ Sign up error:', error);
-      showError('signup', 'Error redirecting to account creation. Please try again.');
-    }
-  } catch (error) {
-    console.error('❌ Fatal error in handleSignUp:', error);
-    showError('signup', 'A critical error occurred. Please try again.');
-  }
-}
+// This function is no longer needed since we're using Shopify's native forms
+// Shopify handles all authentication, CAPTCHA, and validation automatically
 
 // Shopify Native Customer Account Functions
 // These functions integrate with Shopify's built-in customer account system
@@ -464,9 +396,7 @@ function factoryLogin() {
   }, 1500);
 }
 
-function showForgotPassword() {
-  alert('Password reset functionality would integrate with Shopify customer accounts. For now, contact support or use the Factory account for testing.');
-}
+// Password reset is now handled by Shopify's native system at /account/recover
 
 function forceLogout() {
   // Clear all data immediately
