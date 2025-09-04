@@ -1,13 +1,44 @@
 {
   "sections": {
-    "redirect": {
+    "account_hero": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "heading": "My Piccatso Account",
+            "heading_size": "h1"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Manage your AI art creations, subscription, and print orders all in one place.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "heading",
+        "text"
+      ],
+      "settings": {
+        "desktop_content_position": "center",
+        "content_alignment": "center",
+        "color_scheme": "scheme-1",
+        "full_width": true,
+        "padding_top": 40,
+        "padding_bottom": 20
+      }
+    },
+    "account_dashboard": {
       "type": "custom-liquid",
       "settings": {
-        "custom_liquid": "<script>window.location.href = '/pages/account';</script><div style='text-align: center; padding: 4rem;'><h2>Redirecting to your dashboard...</h2><p>If you're not redirected automatically, <a href='/pages/account'>click here</a>.</p></div>"
+        "custom_liquid": "{% render 'account-dashboard' %}"
       }
     }
   },
   "order": [
-    "redirect"
+    "account_hero",
+    "account_dashboard"
   ]
 }

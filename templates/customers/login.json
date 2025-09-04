@@ -1,13 +1,10 @@
 {
   "sections": {
-    "redirect": {
-      "type": "custom-liquid",
-      "settings": {
-        "custom_liquid": "<script>window.location.href = '/pages/auth';</script><div style='text-align: center; padding: 4rem;'><h2>Redirecting to sign in...</h2><p>If you're not redirected automatically, <a href='/pages/auth'>click here</a>.</p></div>"
-      }
+    "main": {
+      "type": "main-login"
     }
   },
   "order": [
-    "redirect"
+    "main"
   ]
 }
