@@ -1092,8 +1092,8 @@
           <p style="margin-bottom: 1rem;">Next Billing: <span id="next-billing">No billing scheduled</span></p>
         </div>
         <div style="display: flex; gap: 1rem;">
-          <button class="action-button" onclick="showUpgradeModal()">
-            Upgrade Plan
+          <button class="action-button" onclick="showSubscriptionModal()">
+            Manage Subscription
           </button>
           <button class="action-button secondary" onclick="manageBilling()">
             Manage Billing
@@ -1106,50 +1106,83 @@
 
 </div>
 
-<!-- Upgrade Modal -->
-<div id="upgrade-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
-  <div style="background: white; border-radius: 1.5rem; padding: 3rem; max-width: 500px; width: 90%;">
-    <h2 style="text-align: center; margin-bottom: 2rem;">Upgrade Your Subscription</h2>
+<!-- Subscription Management Modal -->
+<div id="subscription-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center;">
+  <div style="background: white; border-radius: 1.5rem; padding: 3rem; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h2 style="margin: 0;">Manage Subscription</h2>
+      <button onclick="closeSubscriptionModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+    </div>
     
-    <div style="space-y: 1.5rem;">
-      <!-- Premium Tier Option -->
-      <div style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem; cursor: pointer;" onclick="selectPlan('premium')">
+    <!-- Current Subscription Status -->
+    <div id="current-subscription-status" style="background: #f8fafc; border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="margin: 0 0 1rem 0; color: #1e293b;">Current Plan</h3>
+      <div id="current-plan-display">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+    
+    <!-- Subscription Options -->
+    <div id="subscription-options">
+      <h3 style="margin-bottom: 1.5rem; color: #1e293b;">Available Plans</h3>
+      
+      <!-- Free Tier -->
+      <div class="subscription-plan" data-plan="free" data-action="downgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('free', 'downgrade')">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3>⭐ Premium</h3>
-          <span style="font-size: 2rem; font-weight: 800; color: #8B5CF6;">$9.99/mo</span>
+          <h4 style="margin: 0; color: #64748b;">🆓 Free Tier</h4>
+          <span style="font-size: 1.2rem; font-weight: bold; color: #64748b;">$0/month</span>
         </div>
-        <ul style="list-style: none; padding: 0;">
-          <li>✅ 100 generations per month</li>
-          <li>✅ Art history (50 creations)</li>
-          <li>✅ High resolution (1024x1024px)</li>
-          <li>✅ Priority processing</li>
+        <ul style="margin: 0; padding-left: 1.5rem; color: #64748b; font-size: 0.9rem;">
+          <li>10 generations per month</li>
+          <li>Standard resolution (512x512px)</li>
+          <li>Watermarked downloads</li>
+          <li>Community support</li>
         </ul>
       </div>
       
-      <!-- Pro Tier Option -->
-      <div style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 2rem; cursor: pointer;" onclick="selectPlan('pro')">
+      <!-- Premium Tier -->
+      <div class="subscription-plan" data-plan="premium" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('premium', 'upgrade')">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-          <h3>🎨 Pro</h3>
-          <span style="font-size: 2rem; font-weight: 800; color: #10b981;">$39.99/mo</span>
+          <h4 style="margin: 0; color: #8B5CF6;">⭐ Premium Tier</h4>
+          <span style="font-size: 1.2rem; font-weight: bold; color: #8B5CF6;">$9.99/month</span>
         </div>
-        <ul style="list-style: none; padding: 0;">
-          <li>✅ 1000 generations per month</li>
-          <li>✅ Unlimited art history</li>
-          <li>✅ Ultra HD (2048x2048px)</li>
-          <li>✅ Clean downloads (no watermark)</li>
-          <li>✅ 10% print discount</li>
-          <li>✅ Commercial usage rights</li>
+        <ul style="margin: 0; padding-left: 1.5rem; color: #64748b; font-size: 0.9rem;">
+          <li>100 generations per month</li>
+          <li>High resolution (1024x1024px)</li>
+          <li>Art history saved (50 creations)</li>
+          <li>Favorites collection</li>
+          <li>Email support (48hr response)</li>
+        </ul>
+      </div>
+      
+      <!-- Pro Tier -->
+      <div class="subscription-plan" data-plan="pro" data-action="upgrade" style="border: 2px solid #e2e8f0; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer; transition: all 0.3s ease;" onclick="selectSubscriptionPlan('pro', 'upgrade')">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h4 style="margin: 0; color: #10b981;">🎨 Pro Tier</h4>
+          <span style="font-size: 1.2rem; font-weight: bold; color: #10b981;">$39.99/month</span>
+        </div>
+        <ul style="margin: 0; padding-left: 1.5rem; color: #64748b; font-size: 0.9rem;">
+          <li>200 generations per month</li>
+          <li>Ultra high resolution (2048x2048px)</li>
+          <li>Unlimited art history</li>
+          <li>Commercial usage rights</li>
+          <li>Priority support</li>
+          <li>10% discount on prints</li>
         </ul>
       </div>
     </div>
     
-    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-      <button class="action-button secondary" onclick="closeUpgradeModal()" style="flex: 1;">
-        Cancel
-      </button>
-      <button class="action-button" onclick="processPlanUpgrade()" style="flex: 1;">
-        Upgrade Now
-      </button>
+    <!-- Action Buttons -->
+    <div id="subscription-actions" style="display: none; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e2e8f0;">
+      <div id="action-description" style="margin-bottom: 1.5rem; padding: 1rem; background: #f1f5f9; border-radius: 0.5rem; font-size: 0.9rem; color: #475569;">
+        <!-- Will be populated by JavaScript -->
+      </div>
+      <div style="display: flex; gap: 1rem;">
+        <button id="confirm-subscription-action" class="action-button" style="flex: 1; padding: 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">
+          <!-- Text will be set by JavaScript -->
+        </button>
+        <button onclick="closeSubscriptionModal()" class="action-button secondary" style="flex: 1; padding: 1rem; background: #64748b; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer;">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1533,13 +1566,27 @@ function loadAccountSettings() {
 }
 
 // Upgrade modal functions
-function showUpgradeModal() {
-  document.getElementById('upgrade-modal').style.display = 'flex';
+function showSubscriptionModal() {
+  // Update current plan display
+  updateCurrentPlanDisplay();
+  
+  // Show modal
+  document.getElementById('subscription-modal').style.display = 'flex';
+  
+  // Hide action buttons initially
+  document.getElementById('subscription-actions').style.display = 'none';
 }
 
-function closeUpgradeModal() {
-  document.getElementById('upgrade-modal').style.display = 'none';
-  selectedPlan = null;
+function closeSubscriptionModal() {
+  document.getElementById('subscription-modal').style.display = 'none';
+  selectedSubscriptionPlan = null;
+  selectedSubscriptionAction = null;
+  
+  // Reset visual selections
+  document.querySelectorAll('.subscription-plan').forEach(plan => {
+    plan.style.borderColor = '#e2e8f0';
+    plan.style.backgroundColor = 'transparent';
+  });
 }
 
 function selectPlan(plan) {
@@ -2202,4 +2249,182 @@ window.upgradeToPro = function() {
     window.subscriptionManager.upgradeTier('pro');
   }
 };
+
+// Subscription Management Functions
+let selectedSubscriptionPlan = null;
+let selectedSubscriptionAction = null;
+
+function selectSubscriptionPlan(plan, action) {
+  selectedSubscriptionPlan = plan;
+  selectedSubscriptionAction = action;
+  
+  // Reset visual selections
+  document.querySelectorAll('.subscription-plan').forEach(p => {
+    p.style.borderColor = '#e2e8f0';
+    p.style.backgroundColor = 'transparent';
+  });
+  
+  // Highlight selected plan
+  const selectedElement = document.querySelector(`[data-plan="${plan}"]`);
+  selectedElement.style.borderColor = action === 'upgrade' ? '#10b981' : '#f59e0b';
+  selectedElement.style.backgroundColor = action === 'upgrade' ? '#f0fdf4' : '#fffbeb';
+  
+  // Show action buttons and update content
+  showSubscriptionAction(plan, action);
+}
+
+function showSubscriptionAction(plan, action) {
+  const actionsDiv = document.getElementById('subscription-actions');
+  const descriptionDiv = document.getElementById('action-description');
+  const confirmBtn = document.getElementById('confirm-subscription-action');
+  
+  actionsDiv.style.display = 'block';
+  
+  if (action === 'upgrade') {
+    descriptionDiv.innerHTML = `
+      <strong>Upgrade to ${plan.charAt(0).toUpperCase() + plan.slice(1)} Tier</strong><br>
+      You will be redirected to checkout to complete your subscription upgrade. 
+      Your new plan will be active immediately after payment.
+    `;
+    confirmBtn.textContent = 'Upgrade Now';
+    confirmBtn.style.background = '#10b981';
+    confirmBtn.onclick = () => processSubscriptionUpgrade(plan);
+  } else if (action === 'downgrade') {
+    descriptionDiv.innerHTML = `
+      <strong>Downgrade to Free Tier</strong><br>
+      Your current subscription will remain active until the next billing date. 
+      After that, you'll be moved to the Free tier with limited features.
+    `;
+    confirmBtn.textContent = 'Schedule Downgrade';
+    confirmBtn.style.background = '#f59e0b';
+    confirmBtn.onclick = () => processSubscriptionDowngrade(plan);
+  }
+}
+
+function updateCurrentPlanDisplay() {
+  const currentPlanDiv = document.getElementById('current-plan-display');
+  const currentTier = currentUser.tier || 'free';
+  
+  const planInfo = {
+    free: { name: 'Free Tier', price: '$0/month', features: ['10 generations/month', 'Standard resolution', 'Watermarked downloads'] },
+    premium: { name: 'Premium Tier', price: '$9.99/month', features: ['100 generations/month', 'High resolution', 'Art history saved'] },
+    pro: { name: 'Pro Tier', price: '$39.99/month', features: ['200 generations/month', 'Ultra HD', 'Commercial rights', 'Print discount'] }
+  };
+  
+  const plan = planInfo[currentTier];
+  
+  currentPlanDiv.innerHTML = `
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h4 style="margin: 0; color: #1e293b;">${plan.name}</h4>
+      <span style="font-size: 1.2rem; font-weight: bold; color: #1e293b;">${plan.price}</span>
+    </div>
+    <ul style="margin: 0; padding-left: 1.5rem; color: #64748b; font-size: 0.9rem;">
+      ${plan.features.map(feature => `<li>${feature}</li>`).join('')}
+    </ul>
+  `;
+}
+
+function processSubscriptionUpgrade(plan) {
+  // Get subscription product IDs (you'll need to replace these with your actual product IDs)
+  const subscriptionProducts = {
+    premium: {
+      productId: 'gid://shopify/Product/YOUR_PREMIUM_PRODUCT_ID',
+      variantId: 'gid://shopify/ProductVariant/YOUR_PREMIUM_VARIANT_ID'
+    },
+    pro: {
+      productId: 'gid://shopify/Product/YOUR_PRO_PRODUCT_ID', 
+      variantId: 'gid://shopify/ProductVariant/YOUR_PRO_VARIANT_ID'
+    }
+  };
+  
+  const product = subscriptionProducts[plan];
+  if (!product) {
+    showNotification('Subscription product not found. Please contact support.', 'error');
+    return;
+  }
+  
+  // Show loading state
+  const confirmBtn = document.getElementById('confirm-subscription-action');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'Processing...';
+  confirmBtn.disabled = true;
+  
+  // Add subscription to cart and redirect to checkout
+  fetch('/cart/add.js', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: product.variantId,
+      quantity: 1,
+      properties: {
+        'Subscription Plan': plan.charAt(0).toUpperCase() + plan.slice(1),
+        'Customer ID': currentUser.id,
+        'Upgrade Action': 'upgrade'
+      }
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.status === 422) {
+      throw new Error(data.description || 'Failed to add to cart');
+    }
+    
+    // Redirect to checkout
+    window.location.href = '/checkout';
+  })
+  .catch(error => {
+    console.error('Error adding subscription to cart:', error);
+    showNotification('Failed to process subscription upgrade. Please try again.', 'error');
+    
+    // Reset button
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
+  });
+}
+
+function processSubscriptionDowngrade(plan) {
+  // Show loading state
+  const confirmBtn = document.getElementById('confirm-subscription-action');
+  const originalText = confirmBtn.textContent;
+  confirmBtn.textContent = 'Processing...';
+  confirmBtn.disabled = true;
+  
+  // For downgrades, we'll update the customer metafields to schedule the change
+  // This would typically be done via a webhook or admin action
+  fetch('/apps/subscription-manager/downgrade', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      customerId: currentUser.id,
+      newTier: plan,
+      action: 'schedule_downgrade'
+    })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      showNotification('Downgrade scheduled successfully. Your current plan remains active until the next billing date.', 'success');
+      closeSubscriptionModal();
+    } else {
+      throw new Error(data.message || 'Failed to schedule downgrade');
+    }
+  })
+  .catch(error => {
+    console.error('Error scheduling downgrade:', error);
+    showNotification('Failed to schedule downgrade. Please contact support.', 'error');
+    
+    // Reset button
+    confirmBtn.textContent = originalText;
+    confirmBtn.disabled = false;
+  });
+}
+
+function manageBilling() {
+  // Redirect to Shopify's customer portal or subscription management
+  window.location.href = '/account';
+}
 </script>

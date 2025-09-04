@@ -1,0 +1,41 @@
+{
+  "subscription_products": {
+    "premium": {
+      "name": "Premium Tier Subscription",
+      "price": "$9.99/month",
+      "product_id": "YOUR_PREMIUM_PRODUCT_ID",
+      "variant_id": "YOUR_PREMIUM_VARIANT_ID",
+      "features": [
+        "100 generations per month",
+        "High resolution (1024x1024px)",
+        "Art history saved (50 creations)",
+        "Favorites collection",
+        "Email support (48hr response)"
+      ]
+    },
+    "pro": {
+      "name": "Pro Tier Subscription", 
+      "price": "$39.99/month",
+      "product_id": "YOUR_PRO_PRODUCT_ID",
+      "variant_id": "YOUR_PRO_VARIANT_ID",
+      "features": [
+        "200 generations per month",
+        "Ultra high resolution (2048x2048px)",
+        "Unlimited art history",
+        "Commercial usage rights",
+        "Priority support",
+        "10% discount on prints"
+      ]
+    }
+  },
+  "instructions": {
+    "setup": [
+      "1. Create subscription products in Shopify Admin",
+      "2. Replace the product_id and variant_id values above with your actual IDs",
+      "3. Ensure your Shopify subscription app is properly configured",
+      "4. Test the checkout flow with a test customer"
+    ],
+    "product_ids_format": "Use the numeric ID format (e.g., '1234567890') not the GID format",
+    "variant_ids_format": "Use the numeric ID format (e.g., '9876543210') not the GID format"
+  }
+}
