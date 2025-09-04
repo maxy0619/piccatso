@@ -8,9 +8,13 @@ window.PiccatsoSubscriptionConfig = {
   
   // Subscription product URLs (for direct product page access)
   subscriptionUrls: {
-    premium: '/products/premium-subscription', // Replace with your actual Premium subscription product URL
-    pro: '/products/pro-subscription' // Replace with your actual Pro subscription product URL
+    premium: '/products/8482650226838', // Your Premium subscription product ID
+    pro: '/products/8482650554518' // Your Pro subscription product ID
   },
+  
+  // Alternative: If the above doesn't work, try these formats:
+  // premium: 'https://piccatso.myshopify.com/products/8482650226838'
+  // pro: 'https://piccatso.myshopify.com/products/8482650554518'
   
   // Widget Configuration
   widget: {

@@ -273,6 +273,10 @@ function processUpgrade(plan) {
   };
   
   const productUrl = subscriptionUrls[plan];
+  
+  console.log('🎯 Subscription URLs:', subscriptionUrls);
+  console.log('🎯 Selected plan:', plan);
+  console.log('🎯 Product URL:', productUrl);
   if (!productUrl) {
     alert('Subscription product not found. Please contact support.');
     return;
