@@ -36,7 +36,8 @@
         <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #8B5CF6; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 600;">POPULAR</div>
         <div style="font-size: 3rem; margin-bottom: 1rem;">⭐</div>
         <h3 style="margin: 0 0 1rem 0; color: #8B5CF6; font-size: 1.5rem;">Premium Tier</h3>
-        <div style="font-size: 2rem; font-weight: bold; color: #8B5CF6; margin-bottom: 1.5rem;">$9.99/month</div>
+        <div style="font-size: 2rem; font-weight: bold; color: #8B5CF6; margin-bottom: 1rem;">$9.99/month</div>
+        <div style="font-size: 1.2rem; color: #64748b; margin-bottom: 1.5rem;">or $99.99/year (Save 17%)</div>
         <ul style="text-align: left; margin: 0; padding-left: 1.5rem; color: #64748b;">
           <li>100 generations per month</li>
           <li>High resolution (1024x1024px)</li>
@@ -54,7 +55,8 @@
         <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.9rem; font-weight: 600;">BEST VALUE</div>
         <div style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
         <h3 style="margin: 0 0 1rem 0; color: #10b981; font-size: 1.5rem;">Pro Tier</h3>
-        <div style="font-size: 2rem; font-weight: bold; color: #10b981; margin-bottom: 1.5rem;">$39.99/month</div>
+        <div style="font-size: 2rem; font-weight: bold; color: #10b981; margin-bottom: 1rem;">$39.99/month</div>
+        <div style="font-size: 1.2rem; color: #64748b; margin-bottom: 1.5rem;">or $399.99/year (Save 17%)</div>
         <ul style="text-align: left; margin: 0; padding-left: 1.5rem; color: #64748b;">
           <li>200 generations per month</li>
           <li>Ultra high resolution (2048x2048px)</li>
@@ -76,6 +78,23 @@
     <div id="action-description" style="margin-bottom: 1.5rem; color: #475569;">
       <!-- Will be populated by JavaScript -->
     </div>
+    
+    <!-- Subscription Frequency Selection -->
+    <div id="frequency-selection" style="margin-bottom: 1.5rem; display: none;">
+      <h4 style="margin: 0 0 1rem 0; color: #1e293b; font-size: 1.1rem;">Choose Billing Frequency:</h4>
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1rem;">
+        <label style="display: flex; align-items: center; cursor: pointer; padding: 0.75rem 1.5rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; transition: all 0.3s ease;">
+          <input type="radio" name="billing-frequency" value="monthly" checked style="margin-right: 0.5rem;">
+          <span style="color: #1e293b; font-weight: 600;">Monthly</span>
+        </label>
+        <label style="display: flex; align-items: center; cursor: pointer; padding: 0.75rem 1.5rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; transition: all 0.3s ease;">
+          <input type="radio" name="billing-frequency" value="yearly" style="margin-right: 0.5rem;">
+          <span style="color: #1e293b; font-weight: 600;">Yearly (Save 17%)</span>
+        </label>
+      </div>
+      <div id="frequency-price" style="font-size: 1.2rem; font-weight: bold; color: #8B5CF6; text-align: center;"></div>
+    </div>
+    
     <div style="display: flex; gap: 1rem;">
       <button id="confirm-action-btn" style="flex: 1; padding: 1rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-size: 1.1rem;">
         <!-- Text will be set by JavaScript -->
@@ -114,10 +133,12 @@ let selectedAction = null;
 document.addEventListener('DOMContentLoaded', function() {
   console.log('🎯 Subscription management page loaded');
   
-  // Set customer ID for tracking
+  // Set customer ID and email for tracking
   if (window.customer && window.customer.id) {
     window.customerId = window.customer.id;
+    window.customerEmail = window.customer.email;
     console.log('🎯 Customer ID set:', window.customerId);
+    console.log('🎯 Customer email set:', window.customerEmail);
   }
   
   loadUserData();
@@ -226,6 +247,8 @@ function showActionConfirmation(plan, action) {
   const confirmationDiv = document.getElementById('action-confirmation');
   const descriptionDiv = document.getElementById('action-description');
   const confirmBtn = document.getElementById('confirm-action-btn');
+  const frequencySelection = document.getElementById('frequency-selection');
+  const frequencyPrice = document.getElementById('frequency-price');
   
   if (action === 'upgrade') {
     descriptionDiv.innerHTML = `
@@ -235,6 +258,17 @@ function showActionConfirmation(plan, action) {
     `;
     confirmBtn.textContent = 'Continue to Checkout';
     confirmBtn.style.background = '#10b981';
+    
+    // Show frequency selection for upgrades
+    frequencySelection.style.display = 'block';
+    updateFrequencyPrice(plan);
+    
+    // Add event listeners for frequency selection
+    const frequencyInputs = document.querySelectorAll('input[name="billing-frequency"]');
+    frequencyInputs.forEach(input => {
+      input.addEventListener('change', () => updateFrequencyPrice(plan));
+    });
+    
   } else if (action === 'downgrade') {
     descriptionDiv.innerHTML = `
       <strong>Downgrade to Free Tier</strong><br>
@@ -243,10 +277,34 @@ function showActionConfirmation(plan, action) {
     `;
     confirmBtn.textContent = 'Schedule Downgrade';
     confirmBtn.style.background = '#f59e0b';
+    
+    // Hide frequency selection for downgrades
+    frequencySelection.style.display = 'none';
   }
   
   confirmationDiv.style.display = 'block';
   confirmationDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function updateFrequencyPrice(plan) {
+  const frequencyPrice = document.getElementById('frequency-price');
+  const selectedFrequency = document.querySelector('input[name="billing-frequency"]:checked').value;
+  
+  let monthlyPrice, yearlyPrice;
+  
+  if (plan === 'premium') {
+    monthlyPrice = '$9.99/month';
+    yearlyPrice = '$99.99/year (Save 17%)';
+  } else if (plan === 'pro') {
+    monthlyPrice = '$39.99/month';
+    yearlyPrice = '$399.99/year (Save 17%)';
+  }
+  
+  if (selectedFrequency === 'monthly') {
+    frequencyPrice.textContent = monthlyPrice;
+  } else {
+    frequencyPrice.textContent = yearlyPrice;
+  }
 }
 
 function hideActionConfirmation() {
@@ -359,14 +417,20 @@ async function processUpgrade(plan) {
       }
     }
     
+    // Get selected frequency
+    const selectedFrequency = document.querySelector('input[name="billing-frequency"]:checked')?.value || 'monthly';
+    console.log('🎯 Selected frequency:', selectedFrequency);
+    
     // Add product to cart with selling plan
     const cartPayload = {
       id: variantId,
       quantity: 1,
       properties: {
         'subscription_plan': plan,
+        'subscription_frequency': selectedFrequency,
         'upgrade_from': 'free',
-        'customer_id': window.customerId || 'unknown'
+        'customer_id': window.customerId || 'unknown',
+        'customer_email': window.customerEmail || 'unknown'
       }
     };
     
